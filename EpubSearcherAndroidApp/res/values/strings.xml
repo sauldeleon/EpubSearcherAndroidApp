@@ -4,5 +4,9 @@
     <string name="app_name">EpubSearcherAndroidApp</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
+    <string name="insert_user">Introduzca usuario</string>
+    <string name="insert_pass">Introduzca contraseña</string>
+    <string name="edit_user">Usuario</string>
+    <string name="edit_pass">Password</string>
 
 </resources>
