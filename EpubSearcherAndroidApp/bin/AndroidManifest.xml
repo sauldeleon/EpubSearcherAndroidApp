@@ -12,7 +12,6 @@
     </uses-permission>
 
     <application
-        android:name="com.dropbox.client2.android.AuthActivity"
         android:allowBackup="true"
         android:configChanges="orientation|keyboard"
         android:icon="@drawable/ic_launcher"
@@ -21,7 +20,7 @@
         android:theme="@style/AppTheme" >
         
         <activity
-            android:name="com.epubsearcherandroidapp.MainActivity"
+            android:name=".DropboxEpubSearcher"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -30,8 +29,7 @@
             </intent-filter>
         </activity>
         
-        <activity
-            
+        <activity            
             android:name="com.dropbox.client2.android.AuthActivity"
             android:configChanges="orientation|keyboard"
             android:launchMode="singleTask" >

@@ -1,27 +1,17 @@
 package com.epubsearcherandroidapp;
 
-import java.io.File;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import android.app.Activity;
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 //import com.dropbox.android.sample.DBRoulette;
@@ -33,7 +23,7 @@ import com.dropbox.client2.session.AccessTokenPair;
 import com.dropbox.client2.session.AppKeyPair;
 import com.dropbox.client2.session.Session.AccessType;
 
-public class MainActivity extends Activity {
+public class DropboxEpubSearcher extends Activity {
 	private static final String TAG = "Dropbox";
 	
 	//Dropbox
@@ -51,22 +41,10 @@ public class MainActivity extends Activity {
 	private Button loginButton;
 	private boolean logged;
 
-//	@Override
-//	protected void onCreate(Bundle savedInstanceState) {
-//		super.onCreate(savedInstanceState);
-//		setContentView(R.layout.activity_main);
-//		
-//		// And later in some initialization function:
-//		AppKeyPair appKeys = new AppKeyPair(APP_KEY, APP_SECRET);
-//		AndroidAuthSession session = new AndroidAuthSession(appKeys, ACCESS_TYPE);
-//		this.mDBApi = new DropboxAPI<AndroidAuthSession>(session);
-//	}
-	
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // We create a new AuthSession so that we can use the Dropbox API.
         AndroidAuthSession session = buildSession();
         mDBApi = new DropboxAPI<AndroidAuthSession>(session);
 
@@ -79,54 +57,14 @@ public class MainActivity extends Activity {
 
         loginButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                // This logs you out if you're logged in, or vice versa
-                if (logged) {
+                 if (logged) {
                     logOut();
                 } else {
-                    // Start the remote authentication
-                    mDBApi.getSession().startAuthentication(MainActivity.this);
+                    mDBApi.getSession().startAuthentication(DropboxEpubSearcher.this);
                 }
             }
         });
 	}
-        
-
-        //mDisplay = (LinearLayout)findViewById(R.id.logged_in_display);
-
-        // This is where a photo is displayed
-       // mImage = (ImageView)findViewById(R.id.image_view);
-
-        // This is the button to take a photo
-       // mPhoto = (Button)findViewById(R.id.photo_button);
-
-        /*mPhoto.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                Intent intent = new Intent();
-                // Picture from camera
-                intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
-
-                // This is not the right way to do this, but for some reason, having
-                // it store it in
-                // MediaStore.Images.Media.EXTERNAL_CONTENT_URI isn't working right.
-
-                Date date = new Date();
-                DateFormat df = new SimpleDateFormat("yyyy-MM-dd-kk-mm-ss");
-
-                String newPicFile = df.format(date) + ".jpg";
-                String outPath = "/sdcard/" + newPicFile;
-                File outFile = new File(outPath);
-
-                mCameraFileName = outFile.toString();
-                Uri outuri = Uri.fromFile(outFile);
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, outuri);
-                Log.i(TAG, "Importing New Picture: " + mCameraFileName);
-                try {
-                    startActivityForResult(intent, NEW_PICTURE);
-                } catch (ActivityNotFoundException e) {
-                    showToast("There doesn't seem to be a camera.");
-                }
-            }
-        });*/
 	
 	protected void onResume() {
 	    super.onResume();
