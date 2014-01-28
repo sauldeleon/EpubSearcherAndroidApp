@@ -32,9 +32,10 @@ public class FileListing extends AsyncTask<Void, Long, Boolean> {
 	private Long mFileLen;
 	private String mErrorMsg;
 	private String path;
+	
+	private String[] list;
 
 	public FileListing(Context context, DropboxAPI<?> api, String dropboxPath) {
-		// We set the context this way so we don't accidentally leak activities
 		mContext = context.getApplicationContext();
 
 		mDBApi = api;
@@ -47,10 +48,6 @@ public class FileListing extends AsyncTask<Void, Long, Boolean> {
 					public void onClick(DialogInterface dialog, int which) {
 						mCanceled = true;
 						mErrorMsg = "Cancelado";
-
-						// This will cancel the getThumbnail operation by
-						// closing
-						// its stream
 						if (mFos != null) {
 							try {
 								mFos.close();
@@ -71,29 +68,27 @@ public class FileListing extends AsyncTask<Void, Long, Boolean> {
 			}
 
 			// Obtenemos metadata del directorio raiz
-			Entry dirent = mDBApi.metadata(path, 0, null, true, null);
+			//Entry dirent = mDBApi.metadata(path, 0, null, true, null);
 
-			// metodo recursivo aqui
-			ArrayList<String> files = new ArrayList<String>();
-			files = getEpubFilesRec(dirent, files);
-
+			// extraemos todos los archivos ePub
+			//ArrayList<String> files = new ArrayList<String>();
+			//files = getEpubFilesRec(dirent, files);
+			// extraemos el primer nivel
+			String [] files = listingFolderPath(path);
+			setList(files);
 			if (mCanceled) {
 				return false;
 			}
 
-			if (files.size() == 0) {
+			if (files.length == 0) {
 				mErrorMsg = "No hay archivos epub en el directorio";
 				return false;
 			}
-			
+
 			if (mCanceled) {
 				return false;
 			}
-
-			// mDrawable = Drawable.createFromPath(cachePath);
-			// We must have a legitimate picture
 			return true;
-
 		} catch (DropboxUnlinkedException e) {
 			// The AuthSession wasn't properly authenticated or user unlinked.
 		} catch (DropboxPartialFileException e) {
@@ -162,16 +157,36 @@ public class FileListing extends AsyncTask<Void, Long, Boolean> {
 		error.show();
 	}
 
-	private ArrayList<String> getEpubFilesRec(Entry dirent, ArrayList<String> files) throws DropboxException {
+	// listar un directorio dado un path de ese directorio
+	private String[] listingFolderPath(String path) throws DropboxException {
+		String[] fnames = null;
+		Entry dirent = mDBApi.metadata(path, 1000, null, true, null);
+		ArrayList<Entry> files = new ArrayList<Entry>();
+		ArrayList<String> dir = new ArrayList<String>();
+		int i = 0;
+		for (Entry ent : dirent.contents) {
+			files.add(ent);// Add it to the list of thumbs we can choose from
+			dir.add(new String(files.get(i++).path));
+		}
+		fnames = dir.toArray(new String[dir.size()]);
+		return fnames;
+	}
+
+	// metodo para listar recursivamente todos los epub, seguramente pase a
+	// deprecated y se muestr biblioteca por directorios
+	/*private ArrayList<String> getEpubFilesRec(Entry dirent,
+			ArrayList<String> files) throws DropboxException {
 		// Listamos todos los epub que hay en el directorio raiz y
 		// subdirectorios
 		if (dirent.contents != null) {
 			for (Entry ent : dirent.contents) {
 				if (ent.isDir) {
-					Entry direntIn = mDBApi.metadata(ent.path, 0, null, true, null);
-					files.addAll(getEpubFilesRec(direntIn, new ArrayList<String>()));
+					Entry direntIn = mDBApi.metadata(ent.path, 0, null, true,
+							null);
+					files.addAll(getEpubFilesRec(direntIn,
+							new ArrayList<String>()));
 				} else {
-					if(ent.path.endsWith(".epub")){
+					if (ent.path.endsWith(".epub")) {
 						System.out.println(ent.path);
 						files.add(ent.path);
 					}
@@ -179,6 +194,14 @@ public class FileListing extends AsyncTask<Void, Long, Boolean> {
 			}
 		}
 		return files;
+	}*/
+
+	public String[] getList() {
+		return list;
+	}
+
+	public void setList(String[] list) {
+		this.list = list;
 	}
 
 }

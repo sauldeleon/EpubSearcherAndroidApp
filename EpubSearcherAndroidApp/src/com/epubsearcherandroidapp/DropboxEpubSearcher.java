@@ -1,11 +1,11 @@
 package com.epubsearcherandroidapp;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -18,7 +18,8 @@ import com.dropbox.client2.session.AppKeyPair;
 import com.dropbox.client2.session.Session.AccessType;
 import com.dropbox.client2.session.TokenPair;
 
-public class DropboxEpubSearcher extends Activity {
+public class DropboxEpubSearcher extends Activity{
+
 	private static final String TAG = "Dropbox";
 
 	// Dropbox
@@ -26,7 +27,7 @@ public class DropboxEpubSearcher extends Activity {
 	final static private String APP_SECRET = "bub07yv0jzjqg4d";
 	final static private AccessType ACCESS_TYPE = AccessType.DROPBOX;
 
-	// You don't need to change these, leave them alone.
+	// Atributos para el uso de la API de Dropbox para android
 	final static private String ACCOUNT_PREFS_NAME = "prefs";
 	final static private String ACCESS_KEY_NAME = "ACCESS_KEY";
 	final static private String ACCESS_SECRET_NAME = "ACCESS_SECRET";
@@ -61,31 +62,43 @@ public class DropboxEpubSearcher extends Activity {
 			}
 		});
 		
-		// This is the button to take a photo
+		// Botón de listado de libros, aquí es donde iniciaremos el activity de listar libros, por defecto, por título
 		listingButton = (Button)findViewById(R.id.listing_button);
 
 		listingButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
+            	//llamada al directorio raiz
             	FileListing download = new FileListing(DropboxEpubSearcher.this, mDBApi, "/");
                 download.execute();
+        		//llamada al activity de listado
+                goToListingActivity(download.getList());
             }
         });
 	}
+	
+	private void goToListingActivity(String[] list){
+        Intent activityList = new Intent(this, ListingActivity.class);
+        Bundle b = new Bundle();
+        b.putSerializable("listado", list); 
+        activityList.putExtras(b);
+        startActivity(activityList);
+        //finish();
+	}
 
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onResume()
+	 */
 	@Override
 	protected void onResume() {
 		super.onResume();
 		AndroidAuthSession session = mDBApi.getSession();
 
-		// The next part must be inserted in the onResume() method of the
-		// activity from which session.startAuthentication() was called, so
-		// that Dropbox authentication completes properly.
+		//para recuperar la sesión del último login y no tener que relogear
 		if (session.authenticationSuccessful()) {
 			try {
-				// Mandatory call to complete the auth
 				session.finishAuthentication();
 
-				// Store it locally in our app for later use
+				// guardamos localmente la sesión
 				TokenPair tokens = session.getAccessTokenPair();
 				storeKeys(tokens.key, tokens.secret);
 				setLoggedIn(true);
@@ -97,17 +110,11 @@ public class DropboxEpubSearcher extends Activity {
 		}
 	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
-	}
-
 	private AndroidAuthSession buildSession() {
 		AppKeyPair appKeyPair = new AppKeyPair(APP_KEY, APP_SECRET);
 		AndroidAuthSession session;
-
+		
+		//construimos una sesion a partir de los datos almacenados previamente, si existen
 		String[] stored = getKeys();
 		if (stored != null) {
 			AccessTokenPair accessToken = new AccessTokenPair(stored[0],
@@ -121,12 +128,17 @@ public class DropboxEpubSearcher extends Activity {
 		return session;
 	}
 
+	private void logOut() {
+		// Borramos credenciales de la sesion
+		mDBApi.getSession().unlink();
+		// Borramos las claves del ultimo acceso
+		clearKeys();
+		// Cambiamos la UI al modo de unlinked
+		setLoggedIn(false);
+	}
+	
 	/**
-	 * Shows keeping the access keys returned from Trusted Authenticator in a
-	 * local store, rather than storing user name & password, and
-	 * re-authenticating each time (which is not to be done, ever).
-	 * 
-	 * @return Array of [access_key, access_secret], or null if none stored
+	 * @return las claves para el ultimo login
 	 */
 	private String[] getKeys() {
 		SharedPreferences prefs = getSharedPreferences(ACCOUNT_PREFS_NAME, 0);
@@ -141,21 +153,14 @@ public class DropboxEpubSearcher extends Activity {
 			return null;
 		}
 	}
-
-
-	private void showToast(String msg) {
-		Toast error = Toast.makeText(this, msg, Toast.LENGTH_LONG);
-		error.show();
-	}
-
-	private void logOut() {
-		// Remove credentials from the session
-		mDBApi.getSession().unlink();
-
-		// Clear our stored keys
-		clearKeys();
-		// Change UI state to display logged out version
-		setLoggedIn(false);
+	
+	private void storeKeys(String key, String secret) {
+		// Save the access key for later
+		SharedPreferences prefs = getSharedPreferences(ACCOUNT_PREFS_NAME, 0);
+		Editor edit = prefs.edit();
+		edit.putString(ACCESS_KEY_NAME, key);
+		edit.putString(ACCESS_SECRET_NAME, secret);
+		edit.commit();
 	}
 
 	private void clearKeys() {
@@ -166,7 +171,7 @@ public class DropboxEpubSearcher extends Activity {
 	}
 
 	/**
-	 * Convenience function to change UI state based on being logged in
+	 * EN esta función se hace el cambio de UI cuando hay un cambio en el login 
 	 */
 	private void setLoggedIn(boolean loggedIn) {
 		logged = loggedIn;
@@ -178,13 +183,12 @@ public class DropboxEpubSearcher extends Activity {
 			// OCULTAMOS LOS LISTADOS
 		}
 	}
-
-	private void storeKeys(String key, String secret) {
-		// Save the access key for later
-		SharedPreferences prefs = getSharedPreferences(ACCOUNT_PREFS_NAME, 0);
-		Editor edit = prefs.edit();
-		edit.putString(ACCESS_KEY_NAME, key);
-		edit.putString(ACCESS_SECRET_NAME, secret);
-		edit.commit();
+	
+	/**
+	 * metodo para sacar errores
+	 */
+	private void showToast(String msg) {
+		Toast error = Toast.makeText(this, msg, Toast.LENGTH_LONG);
+		error.show();
 	}
 }

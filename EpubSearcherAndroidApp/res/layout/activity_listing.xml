@@ -8,28 +8,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
-    <ScrollView
-        android:id="@+id/listingScrollView"
-        android:layout_width="wrap_content"
+    <GridView
+        android:id="@+id/listingGridView"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/orderSpinner" >
+        android:layout_below="@+id/orderSpinner"
+        android:layout_centerHorizontal="true"
+        android:numColumns="1" >
 
-        <TableLayout
-            android:id="@+id/listingTable"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="24dp"
-            android:layout_marginTop="28dp" >
-
-            <TableRow
-                android:id="@+id/tableRow1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" >
-            </TableRow>
-        </TableLayout>
-    </ScrollView>
+    </GridView>
 
 </RelativeLayout>
