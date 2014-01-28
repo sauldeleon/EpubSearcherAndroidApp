@@ -1,14 +1,8 @@
 package com.epubsearcherandroidapp;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.app.Activity;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -17,16 +11,12 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.Toast;
 
-//import com.dropbox.android.sample.DBRoulette;
-//import com.dropbox.android.sample.R;
 import com.dropbox.client2.DropboxAPI;
-import com.dropbox.client2.DropboxAPI.Entry;
 import com.dropbox.client2.android.AndroidAuthSession;
-import com.dropbox.client2.android.AuthActivity;
 import com.dropbox.client2.session.AccessTokenPair;
 import com.dropbox.client2.session.AppKeyPair;
-import com.dropbox.client2.session.TokenPair;
 import com.dropbox.client2.session.Session.AccessType;
+import com.dropbox.client2.session.TokenPair;
 
 public class DropboxEpubSearcher extends Activity {
 	private static final String TAG = "Dropbox";
@@ -45,6 +35,8 @@ public class DropboxEpubSearcher extends Activity {
 
 	private Button loginButton;
 	private boolean logged;
+	
+	private Button listingButton;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +60,16 @@ public class DropboxEpubSearcher extends Activity {
 				}
 			}
 		});
+		
+		// This is the button to take a photo
+		listingButton = (Button)findViewById(R.id.listing_button);
+
+		listingButton.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+            	FileListing download = new FileListing(DropboxEpubSearcher.this, mDBApi, "/");
+                download.execute();
+            }
+        });
 	}
 
 	@Override
@@ -170,7 +172,7 @@ public class DropboxEpubSearcher extends Activity {
 		logged = loggedIn;
 		if (loggedIn) {
 			loginButton.setText("Desconectar");
-			// LISTAMOS LOS LIBROS
+			listingButton.setVisibility(View.VISIBLE);
 		} else {
 			loginButton.setText("Entrar a Dropbox");
 			// OCULTAMOS LOS LISTADOS
