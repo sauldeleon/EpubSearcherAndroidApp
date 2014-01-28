@@ -35,7 +35,7 @@
             android:launchMode="singleTask" >
             <intent-filter>
                 <!-- Change this to be db- followed by your app key -->
-                <data android:scheme="db-4lux9y10nib629k" />
+                <data android:scheme="db-4lux9y10nib629kAAA" />
 
                 <action android:name="android.intent.action.VIEW" />
 
