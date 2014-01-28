@@ -88,9 +88,9 @@ public class DropboxEpubSearcher extends Activity {
 				storeKeys(tokens.key, tokens.secret);
 				setLoggedIn(true);
 			} catch (IllegalStateException e) {
-				showToast("Couldn't authenticate with Dropbox:"
+				showToast("No se pudo autenticar con Dropbox"
 						+ e.getLocalizedMessage());
-				Log.i(TAG, "Error authenticating", e);
+				Log.i(TAG, "Error de login", e);
 			}
 		}
 	}
@@ -169,12 +169,11 @@ public class DropboxEpubSearcher extends Activity {
 	private void setLoggedIn(boolean loggedIn) {
 		logged = loggedIn;
 		if (loggedIn) {
-			loginButton.setText("Unlink from Dropbox");
-			// mDisplay.setVisibility(View.VISIBLE);
+			loginButton.setText("Desconectar");
+			// LISTAMOS LOS LIBROS
 		} else {
-			loginButton.setText("Link with Dropbox");
-			// mDisplay.setVisibility(View.GONE);
-			// mImage.setImageDrawable(null);
+			loginButton.setText("Entrar a Dropbox");
+			// OCULTAMOS LOS LISTADOS
 		}
 	}
 
@@ -185,28 +184,5 @@ public class DropboxEpubSearcher extends Activity {
 		edit.putString(ACCESS_KEY_NAME, key);
 		edit.putString(ACCESS_SECRET_NAME, secret);
 		edit.commit();
-	}
-
-	private ArrayList<String> retrieveFolderList() {
-		ArrayList<String> folderName = new ArrayList<String>();
-		try {
-			Entry mainDropBoxDir = mDBApi.metadata("/", 0, null, true, null);
-			if (mainDropBoxDir.isDir) {
-				List<Entry> contents1 = mainDropBoxDir.contents;
-				if (contents1 != null) {
-					folderName.clear();
-					for (int i = 0; i < contents1.size(); i++) {
-						Entry e = contents1.get(i);
-						String a = e.fileName();
-						if (String.valueOf(e.isDir).equalsIgnoreCase("true")) {
-							folderName.add(a);
-							System.out.println(a.toString());
-						}
-					}
-				}
-			}
-		} catch (Exception ex) {
-		}
-		return folderName;
 	}
 }
