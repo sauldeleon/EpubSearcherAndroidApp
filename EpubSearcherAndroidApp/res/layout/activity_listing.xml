@@ -6,7 +6,8 @@
     <Spinner
         android:id="@+id/orderSpinner"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content" 
+        android:entries="@array/order_array"/>
 
     <GridView
         android:id="@+id/listingGridView"

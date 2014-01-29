@@ -8,11 +8,14 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
+import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.widget.Toast;
 
 import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.DropboxAPI.Entry;
+import com.dropbox.client2.android.AndroidAuthSession;
 import com.dropbox.client2.exception.DropboxException;
 import com.dropbox.client2.exception.DropboxIOException;
 import com.dropbox.client2.exception.DropboxParseException;
@@ -24,7 +27,7 @@ public class FileListing extends AsyncTask<Void, Long, Boolean> {
 
 	private Context mContext;
 	private final ProgressDialog mDialog;
-	private DropboxAPI<?> mDBApi;
+	private DropboxAPI<AndroidAuthSession> mDBApi;
 
 	private FileOutputStream mFos;
 
@@ -32,10 +35,11 @@ public class FileListing extends AsyncTask<Void, Long, Boolean> {
 	private Long mFileLen;
 	private String mErrorMsg;
 	private String path;
-	
+
 	private String[] list;
 
-	public FileListing(Context context, DropboxAPI<?> api, String dropboxPath) {
+	public FileListing(Context context, DropboxAPI<AndroidAuthSession> api,
+			String dropboxPath) {
 		mContext = context.getApplicationContext();
 
 		mDBApi = api;
@@ -68,13 +72,13 @@ public class FileListing extends AsyncTask<Void, Long, Boolean> {
 			}
 
 			// Obtenemos metadata del directorio raiz
-			//Entry dirent = mDBApi.metadata(path, 0, null, true, null);
+			// Entry dirent = mDBApi.metadata(path, 0, null, true, null);
 
 			// extraemos todos los archivos ePub
-			//ArrayList<String> files = new ArrayList<String>();
-			//files = getEpubFilesRec(dirent, files);
+			// ArrayList<String> files = new ArrayList<String>();
+			// files = getEpubFilesRec(dirent, files);
 			// extraemos el primer nivel
-			String [] files = listingFolderPath(path);
+			String[] files = listingFolderPath(path);
 			setList(files);
 			if (mCanceled) {
 				return false;
@@ -144,12 +148,21 @@ public class FileListing extends AsyncTask<Void, Long, Boolean> {
 	protected void onPostExecute(Boolean result) {
 		mDialog.dismiss();
 		if (result) {
-			// Set the image now that we have it
-			// mView.setImageDrawable(mDrawable);
+			goToListingActivity();
 		} else {
 			// Couldn't download it, so show an error
 			showToast(mErrorMsg);
 		}
+	}
+
+	private void goToListingActivity() {
+		Intent activityList = new Intent(mContext, ListingActivity.class);
+		ListingActivity.mDBApi = mDBApi;
+		Bundle b = new Bundle();
+		b.putStringArray("listado", this.list);
+		activityList.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		activityList.putExtras(b);
+		mContext.startActivity(activityList);
 	}
 
 	private void showToast(String msg) {
@@ -174,27 +187,16 @@ public class FileListing extends AsyncTask<Void, Long, Boolean> {
 
 	// metodo para listar recursivamente todos los epub, seguramente pase a
 	// deprecated y se muestr biblioteca por directorios
-	/*private ArrayList<String> getEpubFilesRec(Entry dirent,
-			ArrayList<String> files) throws DropboxException {
-		// Listamos todos los epub que hay en el directorio raiz y
-		// subdirectorios
-		if (dirent.contents != null) {
-			for (Entry ent : dirent.contents) {
-				if (ent.isDir) {
-					Entry direntIn = mDBApi.metadata(ent.path, 0, null, true,
-							null);
-					files.addAll(getEpubFilesRec(direntIn,
-							new ArrayList<String>()));
-				} else {
-					if (ent.path.endsWith(".epub")) {
-						System.out.println(ent.path);
-						files.add(ent.path);
-					}
-				}
-			}
-		}
-		return files;
-	}*/
+	/*
+	 * private ArrayList<String> getEpubFilesRec(Entry dirent, ArrayList<String>
+	 * files) throws DropboxException { // Listamos todos los epub que hay en el
+	 * directorio raiz y // subdirectorios if (dirent.contents != null) { for
+	 * (Entry ent : dirent.contents) { if (ent.isDir) { Entry direntIn =
+	 * mDBApi.metadata(ent.path, 0, null, true, null);
+	 * files.addAll(getEpubFilesRec(direntIn, new ArrayList<String>())); } else
+	 * { if (ent.path.endsWith(".epub")) { System.out.println(ent.path);
+	 * files.add(ent.path); } } } } return files; }
+	 */
 
 	public String[] getList() {
 		return list;

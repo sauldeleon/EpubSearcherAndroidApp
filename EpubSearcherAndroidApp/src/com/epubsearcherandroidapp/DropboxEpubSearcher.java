@@ -37,7 +37,7 @@ public class DropboxEpubSearcher extends Activity{
 	private Button loginButton;
 	private boolean logged;
 	
-	private Button listingButton;
+	//private Button listingButton;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +63,7 @@ public class DropboxEpubSearcher extends Activity{
 		});
 		
 		// Botón de listado de libros, aquí es donde iniciaremos el activity de listar libros, por defecto, por título
-		listingButton = (Button)findViewById(R.id.listing_button);
+	/*	listingButton = (Button)findViewById(R.id.listing_button);
 
 		listingButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
@@ -73,17 +73,18 @@ public class DropboxEpubSearcher extends Activity{
         		//llamada al activity de listado
                 goToListingActivity(download.getList());
             }
-        });
+        });*/
 	}
 	
-	private void goToListingActivity(String[] list){
+	/*private void goToListingActivity(String[] list){
         Intent activityList = new Intent(this, ListingActivity.class);
+        ListingActivity.mDBApi=mDBApi;
         Bundle b = new Bundle();
-        b.putSerializable("listado", list); 
+        b.putStringArray("listado", list); 
         activityList.putExtras(b);
         startActivity(activityList);
         //finish();
-	}
+	}*/
 
 	/* (non-Javadoc)
 	 * @see android.app.Activity#onResume()
@@ -92,7 +93,7 @@ public class DropboxEpubSearcher extends Activity{
 	protected void onResume() {
 		super.onResume();
 		AndroidAuthSession session = mDBApi.getSession();
-
+		
 		//para recuperar la sesión del último login y no tener que relogear
 		if (session.authenticationSuccessful()) {
 			try {
@@ -102,6 +103,8 @@ public class DropboxEpubSearcher extends Activity{
 				TokenPair tokens = session.getAccessTokenPair();
 				storeKeys(tokens.key, tokens.secret);
 				setLoggedIn(true);
+				FileListing fileListing = new FileListing(DropboxEpubSearcher.this, mDBApi, "/");
+                fileListing.execute();
 			} catch (IllegalStateException e) {
 				showToast("No se pudo autenticar con Dropbox"
 						+ e.getLocalizedMessage());
@@ -177,7 +180,6 @@ public class DropboxEpubSearcher extends Activity{
 		logged = loggedIn;
 		if (loggedIn) {
 			loginButton.setText("Desconectar");
-			listingButton.setVisibility(View.VISIBLE);
 		} else {
 			loginButton.setText("Entrar a Dropbox");
 			// OCULTAMOS LOS LISTADOS

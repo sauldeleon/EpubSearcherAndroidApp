@@ -14,7 +14,6 @@
     <string-array name="order_array">
         <item>Ordenar por fecha</item>
         <item>Ordenar por nombre de archivo</item>
-        <item>Ordenar por nombre de epub</item>
     </string-array>
 
 </resources>
