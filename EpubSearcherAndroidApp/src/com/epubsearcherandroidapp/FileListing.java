@@ -2,7 +2,8 @@ package com.epubsearcherandroidapp;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -36,7 +37,7 @@ public class FileListing extends AsyncTask<Void, Long, Boolean> {
 	private String mErrorMsg;
 	private String path;
 
-	private String[] list;
+	private HashMap<String, EntryMetadata> list;
 
 	public FileListing(Context context, DropboxAPI<AndroidAuthSession> api,
 			String dropboxPath) {
@@ -78,16 +79,19 @@ public class FileListing extends AsyncTask<Void, Long, Boolean> {
 			// ArrayList<String> files = new ArrayList<String>();
 			// files = getEpubFilesRec(dirent, files);
 			// extraemos el primer nivel
-			String[] files = listingFolderPath(path);
+
+			// String[] files = listingFolderPath(path);
+
+			HashMap<String, EntryMetadata> files = listingFolderPath(path);
 			setList(files);
 			if (mCanceled) {
 				return false;
 			}
 
-			if (files.length == 0) {
-				mErrorMsg = "No hay archivos epub en el directorio";
-				return false;
-			}
+			/*
+			 * if (files.length == 0) { mErrorMsg =
+			 * "No hay archivos epub en el directorio"; return false; }
+			 */
 
 			if (mCanceled) {
 				return false;
@@ -159,7 +163,8 @@ public class FileListing extends AsyncTask<Void, Long, Boolean> {
 		Intent activityList = new Intent(mContext, ListingActivity.class);
 		ListingActivity.mDBApi = mDBApi;
 		Bundle b = new Bundle();
-		b.putStringArray("listado", this.list);
+		// b.putStringArray("listado", this.list);
+		b.putSerializable("listado", this.list);
 		activityList.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		activityList.putExtras(b);
 		mContext.startActivity(activityList);
@@ -171,18 +176,24 @@ public class FileListing extends AsyncTask<Void, Long, Boolean> {
 	}
 
 	// listar un directorio dado un path de ese directorio
-	private String[] listingFolderPath(String path) throws DropboxException {
-		String[] fnames = null;
+	private HashMap<String, EntryMetadata> listingFolderPath(String path)
+			throws DropboxException {
 		Entry dirent = mDBApi.metadata(path, 1000, null, true, null);
-		ArrayList<Entry> files = new ArrayList<Entry>();
-		ArrayList<String> dir = new ArrayList<String>();
-		int i = 0;
+
+		//ArrayList<Entry> files = new ArrayList<Entry>();
+
+		HashMap<String, EntryMetadata> pathEntries = new HashMap<String, EntryMetadata>();
+
+		//int i = 0;
 		for (Entry ent : dirent.contents) {
-			files.add(ent);// Add it to the list of thumbs we can choose from
-			dir.add(new String(files.get(i++).path));
+			//files.add(ent);// Add it to the list of thumbs we can choose from
+			//String direccion = new String(files.get(i++).path);
+			EntryMetadata e = new EntryMetadata(ent.path, ent.fileName(),
+					new Date(ent.modified));
+			pathEntries.put(ent.path, e);
 		}
-		fnames = dir.toArray(new String[dir.size()]);
-		return fnames;
+
+		return pathEntries;
 	}
 
 	// metodo para listar recursivamente todos los epub, seguramente pase a
@@ -198,12 +209,12 @@ public class FileListing extends AsyncTask<Void, Long, Boolean> {
 	 * files.add(ent.path); } } } } return files; }
 	 */
 
-	public String[] getList() {
+	public HashMap<String, EntryMetadata> getList() {
 		return list;
 	}
 
-	public void setList(String[] list) {
-		this.list = list;
+	public void setList(HashMap<String, EntryMetadata> files) {
+		this.list = files;
 	}
 
 }
