@@ -2,29 +2,28 @@ package com.epubsearcherandroidapp;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import com.dropbox.client2.DropboxAPI.Entry;
 
 /**
- * @author Tirias
- * Clase creada para poder serializar un metadata y poder pasarlo a traves de las actividades
+ * @author Tirias Clase creada para poder serializar un metadata y poder pasarlo
+ *         a traves de las actividades
  */
 public class EntryMetadata extends Entry implements Serializable {
 
-	
 	private static final long serialVersionUID = 8376999574027749880L;
 	private String path;
 	private String name;
 	private String modificationDate;
-	
-	
 
 	public EntryMetadata(String path, String name, String modificationDate) {
 		super();
 		this.path = path;
 		this.name = name;
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-mm-dd");
-		this.modificationDate = formatter.format(modificationDate);
+		Date d = new Date(modificationDate);
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+		this.modificationDate = formatter.format(d);
 	}
 
 	public String getPath() {
@@ -52,4 +51,3 @@ public class EntryMetadata extends Entry implements Serializable {
 	}
 
 }
-

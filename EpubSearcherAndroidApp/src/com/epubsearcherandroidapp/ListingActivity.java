@@ -1,12 +1,9 @@
 package com.epubsearcherandroidapp;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -66,13 +63,17 @@ public class ListingActivity extends Activity {
 				// ojo con esto, aqui SIEMPRE tiene que ir el path
 
 				String text = ((TextView) v).getText().toString();
+
+				// de donde saco la ruta?
+				String path = searchPath(text);
 				FileListing fileListing = new FileListing(ListingActivity.this,
-						mDBApi, text, -1);
+						mDBApi, path);
 				fileListing.execute();
 				Toast.makeText(getApplicationContext(),
 						((TextView) v).getText(), Toast.LENGTH_SHORT).show();
 				return;
 			}
+
 		});
 
 		orderSpinner = (Spinner) findViewById(R.id.orderSpinner);
@@ -107,77 +108,88 @@ public class ListingActivity extends Activity {
 		});
 	}
 
+	private String searchPath(String text) {
+		String path = "";
+		if (text.startsWith("/")) {
+			path = text;
+		} else {
+			for (Iterator<EntryMetadata> iterator = listFiles.values()
+					.iterator(); iterator.hasNext();) {
+				EntryMetadata e = iterator.next();
+				String fileName = text.substring(0, text.indexOf("-#-"));
+				if (e.getName().contains(fileName.trim())) {
+					path = e.getPath();
+					break;
+				}
+			}
+		}
+		return path;
+	}
+
 	private String[] order(int orderBy) {
 		String[] resp = null;
 		ArrayList<String> aux = new ArrayList<String>();
 
-		ArrayList<EntryMetadata> values = (ArrayList<EntryMetadata>) listFiles
-				.values();
-		
-		Comparator<EntryMetadata> compareByPath = new Comparator<EntryMetadata>() {
-			//comparador por fecha
-			@Override
-			public int compare(EntryMetadata arg0,
-					EntryMetadata arg1) {
-				String a0 = arg0.getPath();
-				String a1 = arg1.getPath();				
-				return a0.compareTo(a1);
-			}
-		};
+		Collection<EntryMetadata> v = listFiles.values();
+		ArrayList<EntryMetadata> values = new ArrayList<EntryMetadata>(v);
 
-		Comparator<EntryMetadata> compareByName = new Comparator<EntryMetadata>() {
-			//comparador por nombre
-			@Override
-			public int compare(EntryMetadata arg0,
-					EntryMetadata arg1) {
-				String a0 = arg0.getName();
-				String a1 = arg1.getName();				
-				return a0.compareTo(a1);
-			}
-		};
-		
-		Comparator<EntryMetadata> compareByDate = new Comparator<EntryMetadata>() {
-			//comparador por fecha
-			@Override
-			public int compare(EntryMetadata arg0,
-					EntryMetadata arg1) {
-				String a0 = arg0.getModificationDate();
-				String a1 = arg1.getModificationDate();				
-				return a0.compareTo(a1);
-			}
-		};
-		
 		if (orderBy == 0) {
 			// order by path
+			Comparator<EntryMetadata> compareByPath = new Comparator<EntryMetadata>() {
+				// comparador por path
+				@Override
+				public int compare(EntryMetadata arg0, EntryMetadata arg1) {
+					String a0 = arg0.getPath();
+					String a1 = arg1.getPath();
+					return a0.compareTo(a1);
+				}
+			};
 			Collections.sort(values, compareByPath);
-//			for (Iterator<String> iterator = listFiles.keySet().iterator(); iterator
-//					.hasNext();) {
-//				String path = iterator.next();
-//				aux.add(path);
-//			}
+			for (Iterator<EntryMetadata> iterator = values.iterator(); iterator
+					.hasNext();) {
+				String path = iterator.next().getPath();
+				aux.add(path);
+			}
 		} else if (orderBy == 1) {
 			// order by name
+			Comparator<EntryMetadata> compareByName = new Comparator<EntryMetadata>() {
+				// comparador por nombre
+				@Override
+				public int compare(EntryMetadata arg0, EntryMetadata arg1) {
+					String a0 = arg0.getName();
+					String a1 = arg1.getName();
+					return a0.compareTo(a1);
+				}
+			};
 			Collections.sort(values, compareByName);
-//			for (Iterator<String> iterator = listFiles.keySet().iterator(); iterator
-//					.hasNext();) {
-//				String path = iterator.next();
-//				aux.add(listFiles.get(path).getName());
-//			}
+			for (Iterator<EntryMetadata> iterator = values.iterator(); iterator
+					.hasNext();) {
+				EntryMetadata e = iterator.next();
+				String name = e.getName();
+				String date = e.getModificationDate();
+				aux.add(name + " -#- " + date);
+			}
 		} else if (orderBy == 2) {
 			// order by modification date
+			Comparator<EntryMetadata> compareByDate = new Comparator<EntryMetadata>() {
+				// comparador por fecha
+				@Override
+				public int compare(EntryMetadata arg0, EntryMetadata arg1) {
+					String a0 = arg0.getModificationDate();
+					String a1 = arg1.getModificationDate();
+					return a0.compareTo(a1);
+				}
+			};
 			Collections.sort(values, compareByDate);
-//			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-mm-dd");
-//			for (Iterator<String> iterator = listFiles.keySet().iterator(); iterator
-//					.hasNext();) {
-//				String path = iterator.next();
-//				aux.add(formatter.format(listFiles.get(path)
-//						.getModificationDate()));
-//			}
-//			resp = aux.toArray(new String[0]);
-//			Arrays.sort(resp);
+			for (Iterator<EntryMetadata> iterator = values.iterator(); iterator
+					.hasNext();) {
+				EntryMetadata e = iterator.next();
+				String name = e.getName();
+				String date = e.getModificationDate();
+				aux.add(name + " -#- " + date);
+			}
 		}
 		resp = aux.toArray(new String[0]);
-		Arrays.sort(resp);
 		return resp;
 	}
 }

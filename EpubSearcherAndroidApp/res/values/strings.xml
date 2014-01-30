@@ -9,7 +9,6 @@
     <string name="edit_user">Usuario</string>
     <string name="edit_pass">Password</string>
     <string name="login_button">Login</string>
-    <string name="listingButton">Listar Epubs</string>
     
     <string-array name="order_array">
         <item>Ordenar...</item>

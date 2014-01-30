@@ -80,7 +80,7 @@ public class DropboxEpubSearcher extends Activity{
 				storeKeys(tokens.key, tokens.secret);
 				setLoggedIn(true);
 				//default order by path
-				FileListing fileListing = new FileListing(DropboxEpubSearcher.this, mDBApi, "/", -1);
+				FileListing fileListing = new FileListing(DropboxEpubSearcher.this, mDBApi, "/");
                 fileListing.execute();
 			} catch (IllegalStateException e) {
 				showToast("No se pudo autenticar con Dropbox"

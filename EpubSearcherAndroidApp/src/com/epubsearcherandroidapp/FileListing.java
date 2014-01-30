@@ -39,7 +39,7 @@ public class FileListing extends AsyncTask<Void, Long, Boolean> {
 	private HashMap<String, EntryMetadata> list;
 
 	public FileListing(Context context, DropboxAPI<AndroidAuthSession> api,
-			String dropboxPath, int orderBy) {
+			String dropboxPath) {
 		mContext = context.getApplicationContext();
 
 		mDBApi = api;
