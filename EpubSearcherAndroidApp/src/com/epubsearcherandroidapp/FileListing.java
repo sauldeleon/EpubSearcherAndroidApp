@@ -38,8 +38,7 @@ public class FileListing extends AsyncTask<Void, Long, Boolean> {
 
 	private HashMap<String, EntryMetadata> list;
 
-	public FileListing(Context context, DropboxAPI<AndroidAuthSession> api,
-			String dropboxPath) {
+	public FileListing(Context context, DropboxAPI<AndroidAuthSession> api, String dropboxPath) {
 		mContext = context.getApplicationContext();
 
 		mDBApi = api;
@@ -47,19 +46,18 @@ public class FileListing extends AsyncTask<Void, Long, Boolean> {
 		path = dropboxPath;
 		mDialog = new ProgressDialog(context);
 		mDialog.setMessage("Descargando listado de archivos...");
-		mDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancelar",
-				new OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-						mCanceled = true;
-						mErrorMsg = "Cancelado";
-						if (mFos != null) {
-							try {
-								mFos.close();
-							} catch (IOException e) {
-							}
-						}
+		mDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancelar", new OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				mCanceled = true;
+				mErrorMsg = "Cancelado";
+				if (mFos != null) {
+					try {
+						mFos.close();
+					} catch (IOException e) {
 					}
-				});
+				}
+			}
+		});
 
 		mDialog.show();
 	}
@@ -75,7 +73,7 @@ public class FileListing extends AsyncTask<Void, Long, Boolean> {
 			if (mCanceled) {
 				return false;
 			}
-			
+
 			return true;
 		} catch (DropboxUnlinkedException e) {
 			// The AuthSession wasn't properly authenticated or user unlinked.
@@ -155,24 +153,22 @@ public class FileListing extends AsyncTask<Void, Long, Boolean> {
 	}
 
 	// listar un directorio dado un path de ese directorio
-	private HashMap<String, EntryMetadata> listingFolderPath(String path)
-			throws DropboxException {
+	private HashMap<String, EntryMetadata> listingFolderPath(String path) throws DropboxException {
 		HashMap<String, EntryMetadata> pathEntries = new HashMap<String, EntryMetadata>();
-		
+
 		Entry dirent = mDBApi.metadata(path, 1000, null, true, null);
 		if (dirent.isDir) {
-			//Entry dirent = mDBApi.metadata(path, 1000, null, true, null);
+			// Entry dirent = mDBApi.metadata(path, 1000, null, true, null);
 			for (Entry ent : dirent.contents) {
 				if (ent.path.endsWith(".epub") || ent.isDir) {
-					EntryMetadata e = new EntryMetadata(ent.path,
-							ent.fileName(), ent.modified);
+					EntryMetadata e = new EntryMetadata(ent.path, ent.fileName(), ent.modified);
 					pathEntries.put(ent.path, e);
 				}
 			}
-			//folder
+			// folder
 			return pathEntries;
 		}
-		//epub -> aqui investigar como hacer que saque la imagen de la portada
+		// epub -> aqui investigar como hacer que saque la imagen de la portada
 		return pathEntries;
 	}
 

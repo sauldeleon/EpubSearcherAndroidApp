@@ -17,7 +17,7 @@ import com.dropbox.client2.session.AppKeyPair;
 import com.dropbox.client2.session.Session.AccessType;
 import com.dropbox.client2.session.TokenPair;
 
-public class DropboxEpubSearcher extends Activity{
+public class DropboxEpubSearcher extends Activity {
 
 	private static final String TAG = "Dropbox";
 
@@ -35,8 +35,8 @@ public class DropboxEpubSearcher extends Activity{
 
 	private Button loginButton;
 	private boolean logged;
-	
-	//private Button listingButton;
+
+	// private Button listingButton;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -55,22 +55,23 @@ public class DropboxEpubSearcher extends Activity{
 				if (logged) {
 					logOut();
 				} else {
-					mDBApi.getSession().startAuthentication(
-							DropboxEpubSearcher.this);
+					mDBApi.getSession().startAuthentication(DropboxEpubSearcher.this);
 				}
 			}
 		});
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see android.app.Activity#onResume()
 	 */
 	@Override
 	protected void onResume() {
 		super.onResume();
 		AndroidAuthSession session = mDBApi.getSession();
-		
-		//para recuperar la sesión del último login y no tener que relogear
+
+		// para recuperar la sesión del último login y no tener que relogear
 		if (session.authenticationSuccessful()) {
 			try {
 				session.finishAuthentication();
@@ -79,12 +80,11 @@ public class DropboxEpubSearcher extends Activity{
 				TokenPair tokens = session.getAccessTokenPair();
 				storeKeys(tokens.key, tokens.secret);
 				setLoggedIn(true);
-				//default order by path
+				// default order by path
 				FileListing fileListing = new FileListing(DropboxEpubSearcher.this, mDBApi, "/");
-                fileListing.execute();
+				fileListing.execute();
 			} catch (IllegalStateException e) {
-				showToast("No se pudo autenticar con Dropbox"
-						+ e.getLocalizedMessage());
+				showToast("No se pudo autenticar con Dropbox" + e.getLocalizedMessage());
 				Log.i(TAG, "Error de login", e);
 			}
 		}
@@ -93,14 +93,13 @@ public class DropboxEpubSearcher extends Activity{
 	private AndroidAuthSession buildSession() {
 		AppKeyPair appKeyPair = new AppKeyPair(APP_KEY, APP_SECRET);
 		AndroidAuthSession session;
-		
-		//construimos una sesion a partir de los datos almacenados previamente, si existen
+
+		// construimos una sesion a partir de los datos almacenados previamente,
+		// si existen
 		String[] stored = getKeys();
 		if (stored != null) {
-			AccessTokenPair accessToken = new AccessTokenPair(stored[0],
-					stored[1]);
-			session = new AndroidAuthSession(appKeyPair, ACCESS_TYPE,
-					accessToken);
+			AccessTokenPair accessToken = new AccessTokenPair(stored[0], stored[1]);
+			session = new AndroidAuthSession(appKeyPair, ACCESS_TYPE, accessToken);
 		} else {
 			session = new AndroidAuthSession(appKeyPair, ACCESS_TYPE);
 		}
@@ -116,7 +115,7 @@ public class DropboxEpubSearcher extends Activity{
 		// Cambiamos la UI al modo de unlinked
 		setLoggedIn(false);
 	}
-	
+
 	/**
 	 * @return las claves para el ultimo login
 	 */
@@ -133,7 +132,7 @@ public class DropboxEpubSearcher extends Activity{
 			return null;
 		}
 	}
-	
+
 	private void storeKeys(String key, String secret) {
 		// Save the access key for later
 		SharedPreferences prefs = getSharedPreferences(ACCOUNT_PREFS_NAME, 0);
@@ -151,7 +150,7 @@ public class DropboxEpubSearcher extends Activity{
 	}
 
 	/**
-	 * EN esta función se hace el cambio de UI cuando hay un cambio en el login 
+	 * EN esta función se hace el cambio de UI cuando hay un cambio en el login
 	 */
 	private void setLoggedIn(boolean loggedIn) {
 		logged = loggedIn;
@@ -161,7 +160,7 @@ public class DropboxEpubSearcher extends Activity{
 			loginButton.setText("Entrar a Dropbox");
 		}
 	}
-	
+
 	/**
 	 * metodo para sacar errores
 	 */
