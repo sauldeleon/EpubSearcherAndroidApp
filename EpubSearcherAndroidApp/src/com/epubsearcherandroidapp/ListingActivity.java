@@ -139,8 +139,8 @@ public class ListingActivity extends Activity {
 				// comparador por path
 				@Override
 				public int compare(EntryMetadata arg0, EntryMetadata arg1) {
-					String a0 = arg0.getPath();
-					String a1 = arg1.getPath();
+					String a0 = arg0.getPath().toUpperCase();
+					String a1 = arg1.getPath().toUpperCase();
 					return a0.compareTo(a1);
 				}
 			};
@@ -156,8 +156,8 @@ public class ListingActivity extends Activity {
 				// comparador por nombre
 				@Override
 				public int compare(EntryMetadata arg0, EntryMetadata arg1) {
-					String a0 = arg0.getName();
-					String a1 = arg1.getName();
+					String a0 = arg0.getName().toUpperCase();
+					String a1 = arg1.getName().toUpperCase();
 					return a0.compareTo(a1);
 				}
 			};
@@ -175,8 +175,8 @@ public class ListingActivity extends Activity {
 				// comparador por fecha
 				@Override
 				public int compare(EntryMetadata arg0, EntryMetadata arg1) {
-					String a0 = arg0.getModificationDate();
-					String a1 = arg1.getModificationDate();
+					String a0 = arg0.getModificationDate().toUpperCase();
+					String a1 = arg1.getModificationDate().toUpperCase();
 					return a0.compareTo(a1);
 				}
 			};
