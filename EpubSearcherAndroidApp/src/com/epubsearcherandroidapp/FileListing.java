@@ -2,7 +2,6 @@ package com.epubsearcherandroidapp;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Date;
 import java.util.HashMap;
 
 import android.app.ProgressDialog;
@@ -40,14 +39,14 @@ public class FileListing extends AsyncTask<Void, Long, Boolean> {
 	private HashMap<String, EntryMetadata> list;
 
 	public FileListing(Context context, DropboxAPI<AndroidAuthSession> api,
-			String dropboxPath) {
+			String dropboxPath, int orderBy) {
 		mContext = context.getApplicationContext();
 
 		mDBApi = api;
 
 		path = dropboxPath;
 		mDialog = new ProgressDialog(context);
-		mDialog.setMessage("Descargando lista de archivos...");
+		mDialog.setMessage("Descargando listado de archivos...");
 		mDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancelar",
 				new OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) {
@@ -71,31 +70,12 @@ public class FileListing extends AsyncTask<Void, Long, Boolean> {
 			if (mCanceled) {
 				return false;
 			}
-
-			// Obtenemos metadata del directorio raiz
-			// Entry dirent = mDBApi.metadata(path, 0, null, true, null);
-
-			// extraemos todos los archivos ePub
-			// ArrayList<String> files = new ArrayList<String>();
-			// files = getEpubFilesRec(dirent, files);
-			// extraemos el primer nivel
-
-			// String[] files = listingFolderPath(path);
-
 			HashMap<String, EntryMetadata> files = listingFolderPath(path);
 			setList(files);
 			if (mCanceled) {
 				return false;
 			}
-
-			/*
-			 * if (files.length == 0) { mErrorMsg =
-			 * "No hay archivos epub en el directorio"; return false; }
-			 */
-
-			if (mCanceled) {
-				return false;
-			}
+			
 			return true;
 		} catch (DropboxUnlinkedException e) {
 			// The AuthSession wasn't properly authenticated or user unlinked.
@@ -154,7 +134,7 @@ public class FileListing extends AsyncTask<Void, Long, Boolean> {
 		if (result) {
 			goToListingActivity();
 		} else {
-			// Couldn't download it, so show an error
+			// Error si no se pudo listar
 			showToast(mErrorMsg);
 		}
 	}
@@ -163,7 +143,6 @@ public class FileListing extends AsyncTask<Void, Long, Boolean> {
 		Intent activityList = new Intent(mContext, ListingActivity.class);
 		ListingActivity.mDBApi = mDBApi;
 		Bundle b = new Bundle();
-		// b.putStringArray("listado", this.list);
 		b.putSerializable("listado", this.list);
 		activityList.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		activityList.putExtras(b);
@@ -178,21 +157,22 @@ public class FileListing extends AsyncTask<Void, Long, Boolean> {
 	// listar un directorio dado un path de ese directorio
 	private HashMap<String, EntryMetadata> listingFolderPath(String path)
 			throws DropboxException {
-		Entry dirent = mDBApi.metadata(path, 1000, null, true, null);
-
-		//ArrayList<Entry> files = new ArrayList<Entry>();
-
 		HashMap<String, EntryMetadata> pathEntries = new HashMap<String, EntryMetadata>();
-
-		//int i = 0;
-		for (Entry ent : dirent.contents) {
-			//files.add(ent);// Add it to the list of thumbs we can choose from
-			//String direccion = new String(files.get(i++).path);
-			EntryMetadata e = new EntryMetadata(ent.path, ent.fileName(),
-					new Date(ent.modified));
-			pathEntries.put(ent.path, e);
+		
+		Entry dirent = mDBApi.metadata(path, 1000, null, true, null);
+		if (dirent.isDir) {
+			//Entry dirent = mDBApi.metadata(path, 1000, null, true, null);
+			for (Entry ent : dirent.contents) {
+				if (ent.path.endsWith(".epub") || ent.isDir) {
+					EntryMetadata e = new EntryMetadata(ent.path,
+							ent.fileName(), ent.modified);
+					pathEntries.put(ent.path, e);
+				}
+			}
+			//folder
+			return pathEntries;
 		}
-
+		//epub -> aqui investigar como hacer que saque la imagen de la portada
 		return pathEntries;
 	}
 

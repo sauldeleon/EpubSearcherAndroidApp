@@ -12,8 +12,9 @@
     <string name="listingButton">Listar Epubs</string>
     
     <string-array name="order_array">
-        <item>Ordenar por fecha</item>
+        <item>Ordenar...</item>
         <item>Ordenar por nombre de archivo</item>
+        <item>Ordenar por fecha</item>
     </string-array>
 
 </resources>

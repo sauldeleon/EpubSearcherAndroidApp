@@ -1,7 +1,6 @@
 package com.epubsearcherandroidapp;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
@@ -61,30 +60,7 @@ public class DropboxEpubSearcher extends Activity{
 				}
 			}
 		});
-		
-		// Botón de listado de libros, aquí es donde iniciaremos el activity de listar libros, por defecto, por título
-	/*	listingButton = (Button)findViewById(R.id.listing_button);
-
-		listingButton.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-            	//llamada al directorio raiz
-            	FileListing download = new FileListing(DropboxEpubSearcher.this, mDBApi, "/");
-                download.execute();
-        		//llamada al activity de listado
-                goToListingActivity(download.getList());
-            }
-        });*/
 	}
-	
-	/*private void goToListingActivity(String[] list){
-        Intent activityList = new Intent(this, ListingActivity.class);
-        ListingActivity.mDBApi=mDBApi;
-        Bundle b = new Bundle();
-        b.putStringArray("listado", list); 
-        activityList.putExtras(b);
-        startActivity(activityList);
-        //finish();
-	}*/
 
 	/* (non-Javadoc)
 	 * @see android.app.Activity#onResume()
@@ -103,7 +79,8 @@ public class DropboxEpubSearcher extends Activity{
 				TokenPair tokens = session.getAccessTokenPair();
 				storeKeys(tokens.key, tokens.secret);
 				setLoggedIn(true);
-				FileListing fileListing = new FileListing(DropboxEpubSearcher.this, mDBApi, "/");
+				//default order by path
+				FileListing fileListing = new FileListing(DropboxEpubSearcher.this, mDBApi, "/", -1);
                 fileListing.execute();
 			} catch (IllegalStateException e) {
 				showToast("No se pudo autenticar con Dropbox"
@@ -182,7 +159,6 @@ public class DropboxEpubSearcher extends Activity{
 			loginButton.setText("Desconectar");
 		} else {
 			loginButton.setText("Entrar a Dropbox");
-			// OCULTAMOS LOS LISTADOS
 		}
 	}
 	
