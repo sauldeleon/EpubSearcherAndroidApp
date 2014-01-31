@@ -1,2 +1,3 @@
 eclipse.preferences.version=1
-encoding//src/com/epubsearcherandroidapp/ListingActivity.java=UTF-8
+encoding//src/com/epubsearcherandroidapp/activities/ListingActivity.java=UTF-8
+encoding//src/com/epubsearcherandroidapp/tasks/FileDownloader.java=UTF-8

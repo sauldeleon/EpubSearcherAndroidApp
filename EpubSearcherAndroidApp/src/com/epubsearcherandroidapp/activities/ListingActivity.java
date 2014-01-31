@@ -1,9 +1,5 @@
-package com.epubsearcherandroidapp;
+package com.epubsearcherandroidapp.activities;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -13,23 +9,15 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 
-import nl.siegmann.epublib.domain.Book;
-import nl.siegmann.epublib.domain.Metadata;
-import nl.siegmann.epublib.domain.TOCReference;
-import nl.siegmann.epublib.epub.EpubReader;
 import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Environment;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
@@ -37,14 +25,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dropbox.client2.DropboxAPI;
-import com.dropbox.client2.DropboxAPI.DropboxFileInfo;
 import com.dropbox.client2.android.AndroidAuthSession;
-import com.dropbox.client2.exception.DropboxException;
+import com.epubsearcherandroidapp.R;
+import com.epubsearcherandroidapp.adapter.ImageAdapterWithText;
+import com.epubsearcherandroidapp.tasks.FileDownloader;
+import com.epubsearcherandroidapp.tasks.FileListing;
+import com.epubsearcherandroidapp.util.EntryMetadata;
 
 public class ListingActivity extends Activity {
 
 	private GridView listingGridView;
-	//private ArrayAdapter<String> adGridView;
+	// private ArrayAdapter<String> adGridView;
 
 	private Spinner orderSpinner;
 
@@ -81,11 +72,6 @@ public class ListingActivity extends Activity {
 					// ordenar por nombre de archivo
 					orderedValues = order(position);
 					shownList = generateViewNames(orderedValues);
-					// adGridView = new
-					// ArrayAdapter<String>(ListingActivity.this,
-					// android.R.layout.simple_list_item_1, shownList);
-					// adGridView.notifyDataSetChanged();
-					// listingGridView.setAdapter(adGridView);
 					ImageAdapterWithText n = new ImageAdapterWithText(ListingActivity.this, shownList);
 					n.notifyDataSetInvalidated();
 					listingGridView.setAdapter(n);
@@ -93,11 +79,6 @@ public class ListingActivity extends Activity {
 					// ordenar por fecha de modificacion
 					orderedValues = order(position);
 					shownList = generateViewNames(orderedValues);
-					// adGridView = new
-					// ArrayAdapter<String>(ListingActivity.this,
-					// android.R.layout.simple_list_item_1, shownList);
-					// adGridView.notifyDataSetChanged();
-					// listingGridView.setAdapter(adGridView);
 					ImageAdapterWithText n = new ImageAdapterWithText(ListingActivity.this, shownList);
 					n.notifyDataSetInvalidated();
 					listingGridView.setAdapter(n);
@@ -118,73 +99,36 @@ public class ListingActivity extends Activity {
 		String[] shownList = generateViewNames(orderedValues);
 
 		listingGridView = (GridView) findViewById(R.id.listingGridView);
-		// adGridView = new ArrayAdapter<String>(this,
-		// android.R.layout.simple_list_item_1, shownList);
-
+		
 		listingGridView.setBackgroundColor(Color.WHITE);
 		listingGridView.setNumColumns(1);
 		listingGridView.setGravity(Gravity.CENTER);
-		// listingGridView.setAdapter(adGridView);
 		listingGridView.setAdapter(new ImageAdapterWithText(this, shownList));
 		listingGridView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-				//String text = ((TextView) v).getText().toString();
-				String text = ((TextView)((RelativeLayout) v).getChildAt(0)).getText().toString();
+				TextView name = ((TextView) ((RelativeLayout) v).getChildAt(2));
+				TextView date = ((TextView) ((RelativeLayout) v).getChildAt(1));
+				
+				String text = name.getText().toString() + " -F- " + date.getText().toString();
 				String path = nameShownPathMap.get(text);
-				if (!path.endsWith(".epub")) {
-					FileListing fileListing = new FileListing(ListingActivity.this, mDBApi, path);
+				if (path == null) {
+					text = name.getText().toString() + " -#- " + date.getText().toString();
+					path = nameShownPathMap.get(text);
+				}
+				if (listFiles.get(path).getIsDir()) {
+					FileListing fileListing = new FileListing(ListingActivity.this, mDBApi, path, false);
 					fileListing.execute();
 				} else {
-					try {
-						String baseDir = Environment.getExternalStorageDirectory().getAbsolutePath();
-						String filename = "prueba.epub";
-						File file = new File(baseDir + File.separator + filename);
-						FileOutputStream outputStream = new FileOutputStream(file);
-
-						DropboxAPI<AndroidAuthSession> mDBApi2 = mDBApi;
-						DropboxFileInfo info = mDBApi2.getFile(path, null, outputStream, null);
-						Log.i("DbExampleLog", "The file's rev is: " + info.getMetadata().rev);
-
-						InputStream is = getAssets().open(path);
-						Book book = new EpubReader().readEpub(is);
-						Metadata metadata = book.getMetadata();
-						String bookInfo = "：" + metadata.getAuthors() + "\n ：" + metadata.getPublishers() + "\n ：" + metadata.getDates() + "\n ：" + metadata.getTitles() + "\n ："
-								+ metadata.getDescriptions() + "\n ：" + metadata.getLanguage() + "\n\n ：";
-						Log.e("epublib", bookInfo);
-						logTableOfContents(book.getTableOfContents().getTocReferences(), 0);
-
-					} catch (IOException e) {
-						Log.e("epublib", e.getMessage());
-					} catch (DropboxException e) {
-						e.printStackTrace();
-					}
+					FileDownloader epubDownloader = new FileDownloader(ListingActivity.this,mDBApi,path);
+					epubDownloader.execute();
+					Toast.makeText(getApplicationContext(), name.getText(), Toast.LENGTH_LONG).show();
 				}
-				Toast.makeText(getApplicationContext(), ((TextView)((RelativeLayout) v).getChildAt(0)).getText(), Toast.LENGTH_SHORT).show();
+				Toast.makeText(getApplicationContext(), name.getText(), Toast.LENGTH_SHORT).show();
 				return;
 			}
 
 		});
-	}
-
-	private void logTableOfContents(List<TOCReference> tocReferences, int depth) {
-		if (tocReferences == null) {
-			return;
-		}
-		for (TOCReference tocReference : tocReferences) {
-			StringBuilder tocstring = new StringBuilder();
-			for (int i = 0; i < depth; i++) {
-				tocstring.append("\t");
-			}
-			HashMap<String, String> map = new HashMap<String, String>();
-			String k = tocstring.append(tocReference.getTitle()).toString();
-			ArrayList<HashMap<String, String>> list1 = new ArrayList<HashMap<String, String>>();
-			list1.add(map);
-			String t = k;
-			Log.i("epublib", tocstring.toString());
-			logTableOfContents(tocReference.getChildren(), depth + 1);
-
-		}
 	}
 
 	private String[] generateViewNames(ArrayList<EntryMetadata> orderedValues) {

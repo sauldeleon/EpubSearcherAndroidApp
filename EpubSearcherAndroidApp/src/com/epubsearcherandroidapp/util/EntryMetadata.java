@@ -1,4 +1,4 @@
-package com.epubsearcherandroidapp;
+package com.epubsearcherandroidapp.util;
 
 import java.io.Serializable;
 import java.text.ParseException;

@@ -1,4 +1,4 @@
-package com.epubsearcherandroidapp;
+package com.epubsearcherandroidapp.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -8,14 +8,17 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.epubsearcherandroidapp.R;
+
 public class ImageAdapterWithText extends BaseAdapter {
 
 	private Context context;
-	private final String[] textValues;
+	private final String[] values;
+	
 
 	public ImageAdapterWithText(Context context, String[] textValues) {
 		this.context = context;
-		this.textValues = textValues;
+		this.values = textValues;
 	}
 
 	public View getView(int position, View convertView, ViewGroup parent) {
@@ -23,22 +26,25 @@ public class ImageAdapterWithText extends BaseAdapter {
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
 		View gridView;
-
+		
 		gridView = new View(context);
 		gridView = inflater.inflate(R.layout.grid_file, null);
 
+		String[] splitted = values[position].split(" -.- ");		
 		// set value into textview
-		TextView textView = (TextView) gridView.findViewById(R.id.gridTextView);
-		textView.setText(textValues[position]);
+		TextView textView = (TextView) gridView.findViewById(R.id.gridTextViewTitle);
+		textView.setText(splitted[0]);
+
+		// set value into textview
+		TextView dateView = (TextView) gridView.findViewById(R.id.gridTextViewDate);
+		dateView.setText(splitted[1]);
 
 		// set image based on selected text
 		ImageView imageView = (ImageView) gridView.findViewById(R.id.gridView_icon);
 
-		String text = textValues[position];
-
-		if (text.contains("-F-")) {
+		if (values[position].contains("-F-")) {
 			imageView.setImageResource(R.drawable.folder_icon);
-		} else if (text.contains("-#-")) {
+		} else if (values[position].contains("-#-")) {
 			imageView.setImageResource(R.drawable.epub_icon);
 		}
 		return gridView;
@@ -46,7 +52,7 @@ public class ImageAdapterWithText extends BaseAdapter {
 
 	@Override
 	public int getCount() {
-		return textValues.length;
+		return values.length;
 	}
 
 	@Override

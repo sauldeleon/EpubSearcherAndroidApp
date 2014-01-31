@@ -1,8 +1,9 @@
-package com.epubsearcherandroidapp;
+package com.epubsearcherandroidapp.tasks;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import android.app.ProgressDialog;
@@ -23,6 +24,8 @@ import com.dropbox.client2.exception.DropboxParseException;
 import com.dropbox.client2.exception.DropboxPartialFileException;
 import com.dropbox.client2.exception.DropboxServerException;
 import com.dropbox.client2.exception.DropboxUnlinkedException;
+import com.epubsearcherandroidapp.activities.ListingActivity;
+import com.epubsearcherandroidapp.util.EntryMetadata;
 
 public class FileListing extends AsyncTask<Void, Long, Boolean> {
 
@@ -36,15 +39,18 @@ public class FileListing extends AsyncTask<Void, Long, Boolean> {
 	private Long mFileLen;
 	private String mErrorMsg;
 	private String path;
+	private Boolean recMode;
 
 	private HashMap<String, EntryMetadata> list;
 
-	public FileListing(Context context, DropboxAPI<AndroidAuthSession> api, String dropboxPath) {
+	public FileListing(Context context, DropboxAPI<AndroidAuthSession> api, String dropboxPath, Boolean recMode) {
 		mContext = context.getApplicationContext();
 
 		mDBApi = api;
 
 		path = dropboxPath;
+		this.recMode = recMode;
+		
 		mDialog = new ProgressDialog(context);
 		mDialog.setMessage("Descargando listado de archivos...");
 		mDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancelar", new OnClickListener() {
@@ -69,7 +75,7 @@ public class FileListing extends AsyncTask<Void, Long, Boolean> {
 			if (mCanceled) {
 				return false;
 			}
-			HashMap<String, EntryMetadata> files = listingFolderPath(path);
+			HashMap<String, EntryMetadata> files = listingFolderPath(path, recMode);
 			setList(files);
 			if (mCanceled) {
 				return false;
@@ -157,37 +163,49 @@ public class FileListing extends AsyncTask<Void, Long, Boolean> {
 	}
 
 	// listar un directorio dado un path de ese directorio
-	private HashMap<String, EntryMetadata> listingFolderPath(String path) throws DropboxException, ParseException {
+	private HashMap<String, EntryMetadata> listingFolderPath(String path, boolean rec) throws DropboxException, ParseException {
 		HashMap<String, EntryMetadata> pathEntries = new HashMap<String, EntryMetadata>();
-
 		Entry dirent = mDBApi.metadata(path, 1000, null, true, null);
-		if (dirent.isDir) {
-			// Entry dirent = mDBApi.metadata(path, 1000, null, true, null);
-			for (Entry ent : dirent.contents) {
-				if (ent.path.endsWith(".epub") || ent.isDir) {
-					EntryMetadata e = new EntryMetadata(ent.path, ent.fileName(), ent.modified, ent.isDir);
-					pathEntries.put(ent.path, e);
+		if (!rec) {			
+			if (dirent.isDir) {
+				// Entry dirent = mDBApi.metadata(path, 1000, null, true, null);
+				for (Entry ent : dirent.contents) {
+					if (ent.path.endsWith(".epub") || ent.isDir) {
+						EntryMetadata e = new EntryMetadata(ent.path, ent.fileName(), ent.modified, ent.isDir);
+						pathEntries.put(ent.path, e);
+					}
 				}
+				// folder
+				return pathEntries;
 			}
-			// folder
-			return pathEntries;
+		}else{
+			//modo recursivo
+			pathEntries = getEpubFilesRec(dirent, new HashMap<String, EntryMetadata>());
 		}
-		// epub -> aqui investigar como hacer que saque la imagen de la portada
 		return pathEntries;
 	}
 
 	// metodo para listar recursivamente todos los epub, seguramente pase a
 	// deprecated y se muestr biblioteca por directorios
-	/*
-	 * private ArrayList<String> getEpubFilesRec(Entry dirent, ArrayList<String>
-	 * files) throws DropboxException { // Listamos todos los epub que hay en el
-	 * directorio raiz y // subdirectorios if (dirent.contents != null) { for
-	 * (Entry ent : dirent.contents) { if (ent.isDir) { Entry direntIn =
-	 * mDBApi.metadata(ent.path, 0, null, true, null);
-	 * files.addAll(getEpubFilesRec(direntIn, new ArrayList<String>())); } else
-	 * { if (ent.path.endsWith(".epub")) { System.out.println(ent.path);
-	 * files.add(ent.path); } } } } return files; }
-	 */
+
+	private HashMap<String, EntryMetadata> getEpubFilesRec(Entry dirent, HashMap<String, EntryMetadata> files) throws DropboxException, ParseException {
+		// Listamos todos los epub que hay en el directorio raiz y
+		// subdirectorios
+		if (dirent.contents != null) {
+			for (Entry ent : dirent.contents) {
+				if (ent.isDir) {
+					Entry direntIn = mDBApi.metadata(ent.path, 0, null, true, null);
+					files.putAll(getEpubFilesRec(direntIn, new HashMap<String, EntryMetadata>()));
+				} else {
+					if (ent.path.endsWith(".epub")) {
+						EntryMetadata e = new EntryMetadata(ent.path, ent.fileName(), ent.modified, ent.isDir);
+						files.put(ent.path, e);
+					}
+				}
+			}
+		}
+		return files;
+	}
 
 	public HashMap<String, EntryMetadata> getList() {
 		return list;

@@ -3,19 +3,24 @@
 
     <string name="app_name">Epub Listing App</string>
     <string name="action_settings">Settings</string>
-    <string name="hello_world">Hello world!</string>
     <string name="insert_user">Introduzca usuario</string>
     <string name="insert_pass">Introduzca contraseña</string>
     <string name="edit_user">Usuario</string>
     <string name="edit_pass">Password</string>
     <string name="login_button">Login</string>
-    
+    <string name="recursiveMode">Búsqueda recursiva</string>
+    <string name="recursiveAdvert">Tardara en función de la cantidad de carpetas y archivos</string>
+
     <string-array name="order_array">
         <item>Ordenar</item>
         <item>Ordenar por nombre de archivo</item>
         <item>Ordenar por fecha</item>
     </string-array>
-    
-    <string name="gridTextViewString">textView</string>
+
+    <string name="gridTextViewTitleString">textView</string>
+    <string name="gridTextViewDateString">textView</string>
+    <string name="title_activity_epub_cover">EpubCoverActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
 
 </resources>
