@@ -2,6 +2,7 @@ package com.epubsearcherandroidapp;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.HashMap;
 
 import android.app.ProgressDialog;
@@ -116,6 +117,9 @@ public class FileListing extends AsyncTask<Void, Long, Boolean> {
 		} catch (DropboxException e) {
 			// Unknown error
 			mErrorMsg = "Unknown error.  Try again.";
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		return false;
 	}
@@ -153,7 +157,7 @@ public class FileListing extends AsyncTask<Void, Long, Boolean> {
 	}
 
 	// listar un directorio dado un path de ese directorio
-	private HashMap<String, EntryMetadata> listingFolderPath(String path) throws DropboxException {
+	private HashMap<String, EntryMetadata> listingFolderPath(String path) throws DropboxException, ParseException {
 		HashMap<String, EntryMetadata> pathEntries = new HashMap<String, EntryMetadata>();
 
 		Entry dirent = mDBApi.metadata(path, 1000, null, true, null);
@@ -161,7 +165,7 @@ public class FileListing extends AsyncTask<Void, Long, Boolean> {
 			// Entry dirent = mDBApi.metadata(path, 1000, null, true, null);
 			for (Entry ent : dirent.contents) {
 				if (ent.path.endsWith(".epub") || ent.isDir) {
-					EntryMetadata e = new EntryMetadata(ent.path, ent.fileName(), ent.modified);
+					EntryMetadata e = new EntryMetadata(ent.path, ent.fileName(), ent.modified, ent.isDir);
 					pathEntries.put(ent.path, e);
 				}
 			}

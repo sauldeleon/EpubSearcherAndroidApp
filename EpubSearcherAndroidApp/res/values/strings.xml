@@ -11,9 +11,11 @@
     <string name="login_button">Login</string>
     
     <string-array name="order_array">
-        <item>Ordenar...</item>
+        <item>Ordenar</item>
         <item>Ordenar por nombre de archivo</item>
         <item>Ordenar por fecha</item>
     </string-array>
+    
+    <string name="gridTextViewString">textView</string>
 
 </resources>

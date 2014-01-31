@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/relativeLayout1"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:padding="5dp" >
+
+    <ImageView
+        android:id="@+id/gridView_icon"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/epub_icon" >
+    </ImageView>
+
+    <TextView
+        android:id="@+id/gridTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/gridView_icon"
+        android:layout_marginTop="2dp"
+        android:ellipsize="marquee"
+        android:text="@string/gridTextViewString"
+        android:textSize="18sp" >
+    </TextView>
+</RelativeLayout>
