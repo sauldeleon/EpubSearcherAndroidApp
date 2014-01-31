@@ -23,6 +23,7 @@ import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.DropboxAPI.DropboxFileInfo;
 import com.dropbox.client2.android.AndroidAuthSession;
 import com.dropbox.client2.exception.DropboxException;
+import com.epubsearcherandroidapp.activities.EpubCoverFullscreenActivity;
 import com.epubsearcherandroidapp.activities.ListingActivity;
 
 public class FileDownloader extends AsyncTask<Void, Long, Boolean> {
@@ -87,22 +88,22 @@ public class FileDownloader extends AsyncTask<Void, Long, Boolean> {
 
 	@Override
 	protected Boolean doInBackground(Void... params) {
-//		try {
-//			if (mCanceled) {
-//				return false;
-//			}
-//			
-//			String baseDir = Environment.getExternalStorageDirectory().getAbsolutePath();
-//			String filename = "prueba.epub";
-//			File file = new File(baseDir + File.separator + filename);
-//			FileOutputStream outputStream = new FileOutputStream(file);
-//
-//			DropboxAPI<AndroidAuthSession> mDBApi2 = mDBApi;
-//			DropboxFileInfo info = mDBApi2.getFile(path, null, outputStream, null);
-//			Log.i("DbExampleLog", "The file's rev is: " + info.getMetadata().rev);
-//			if (mCanceled) {
-//				return false;
-//			}
+		try {
+			if (mCanceled) {
+				return false;
+			}
+			
+			String baseDir = Environment.getExternalStorageDirectory().getAbsolutePath();
+			String filename = "prueba.epub";
+			File file = new File(baseDir + File.separator + filename);
+			FileOutputStream outputStream = new FileOutputStream(file);
+
+			DropboxAPI<AndroidAuthSession> mDBApi2 = mDBApi;
+			DropboxFileInfo info = mDBApi2.getFile(path, null, outputStream, null);
+			Log.i("DbExampleLog", "The file's rev is: " + info.getMetadata().rev);
+			if (mCanceled) {
+				return false;
+			}
 //			InputStream is = getAssets().open(path);
 //			Book book = new EpubReader().readEpub(is);
 //			Metadata metadata = book.getMetadata();
@@ -110,12 +111,12 @@ public class FileDownloader extends AsyncTask<Void, Long, Boolean> {
 //					+ metadata.getDescriptions() + "\n ：" + metadata.getLanguage() + "\n\n ：";
 //			Log.e("epublib", bookInfo);
 //			logTableOfContents(book.getTableOfContents().getTocReferences(), 0);
-//
-//		} catch (IOException e) {
-//			Log.e("epublib", e.getMessage());
-//		} catch (DropboxException e) {
-//			e.printStackTrace();
-//		}
+
+		} catch (IOException e) {
+			Log.e("epublib", e.getMessage());
+		} catch (DropboxException e) {
+			e.printStackTrace();
+		}
 		return true;
 	}
 
@@ -140,12 +141,12 @@ public class FileDownloader extends AsyncTask<Void, Long, Boolean> {
 	}*/
 	
 	private void goToShowCoverActivity() {
-		Intent activityList = new Intent(mContext, ListingActivity.class);
-		ListingActivity.mDBApi = mDBApi;
-		Bundle b = new Bundle();
+		Intent activityList = new Intent(mContext, EpubCoverFullscreenActivity.class);
+		//ListingActivity.mDBApi = mDBApi;
+		//Bundle b = new Bundle();
 		//b.putSerializable("listado", this.list);
 		activityList.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		activityList.putExtras(b);
+		//activityList.putExtras(b);
 		mContext.startActivity(activityList);
 	}
 	
