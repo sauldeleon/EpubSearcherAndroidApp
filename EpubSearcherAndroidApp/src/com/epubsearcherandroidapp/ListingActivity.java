@@ -31,6 +31,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -43,7 +44,7 @@ import com.dropbox.client2.exception.DropboxException;
 public class ListingActivity extends Activity {
 
 	private GridView listingGridView;
-	private ArrayAdapter<String> adGridView;
+	//private ArrayAdapter<String> adGridView;
 
 	private Spinner orderSpinner;
 
@@ -58,8 +59,7 @@ public class ListingActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Bundle b = getIntent().getExtras();
-		listFiles = (HashMap<String, EntryMetadata>) b
-				.getSerializable("listado");
+		listFiles = (HashMap<String, EntryMetadata>) b.getSerializable("listado");
 
 		// Basic Android widgets
 		setContentView(R.layout.activity_listing);
@@ -74,8 +74,7 @@ public class ListingActivity extends Activity {
 		orderSpinner = (Spinner) findViewById(R.id.orderSpinner);
 		orderSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
 			@Override
-			public void onItemSelected(AdapterView<?> parent, View v,
-					int position, long id) {
+			public void onItemSelected(AdapterView<?> parent, View v, int position, long id) {
 				String[] shownList;
 				ArrayList<EntryMetadata> orderedValues;
 				if (position == 1) {
@@ -87,9 +86,8 @@ public class ListingActivity extends Activity {
 					// android.R.layout.simple_list_item_1, shownList);
 					// adGridView.notifyDataSetChanged();
 					// listingGridView.setAdapter(adGridView);
-					ImageAdapterWithText n = new ImageAdapterWithText(
-							ListingActivity.this, shownList);
-					n.notifyDataSetChanged();
+					ImageAdapterWithText n = new ImageAdapterWithText(ListingActivity.this, shownList);
+					n.notifyDataSetInvalidated();
 					listingGridView.setAdapter(n);
 				} else if (position == 2) {
 					// ordenar por fecha de modificacion
@@ -100,9 +98,8 @@ public class ListingActivity extends Activity {
 					// android.R.layout.simple_list_item_1, shownList);
 					// adGridView.notifyDataSetChanged();
 					// listingGridView.setAdapter(adGridView);
-					ImageAdapterWithText n = new ImageAdapterWithText(
-							ListingActivity.this, shownList);
-					n.notifyDataSetChanged();
+					ImageAdapterWithText n = new ImageAdapterWithText(ListingActivity.this, shownList);
+					n.notifyDataSetInvalidated();
 					listingGridView.setAdapter(n);
 				}
 				return;
@@ -131,53 +128,39 @@ public class ListingActivity extends Activity {
 		listingGridView.setAdapter(new ImageAdapterWithText(this, shownList));
 		listingGridView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
-			public void onItemClick(AdapterView<?> parent, View v,
-					int position, long id) {
-				String text = ((TextView) v).getText().toString();
+			public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+				//String text = ((TextView) v).getText().toString();
+				String text = ((TextView)((RelativeLayout) v).getChildAt(0)).getText().toString();
 				String path = nameShownPathMap.get(text);
 				if (!path.endsWith(".epub")) {
-					FileListing fileListing = new FileListing(
-							ListingActivity.this, mDBApi, path);
+					FileListing fileListing = new FileListing(ListingActivity.this, mDBApi, path);
 					fileListing.execute();
 				} else {
 					try {
-						String baseDir = Environment
-								.getExternalStorageDirectory()
-								.getAbsolutePath();
+						String baseDir = Environment.getExternalStorageDirectory().getAbsolutePath();
 						String filename = "prueba.epub";
-						File file = new File(baseDir + File.separator
-								+ filename);
-						FileOutputStream outputStream = new FileOutputStream(
-								file);
+						File file = new File(baseDir + File.separator + filename);
+						FileOutputStream outputStream = new FileOutputStream(file);
 
 						DropboxAPI<AndroidAuthSession> mDBApi2 = mDBApi;
-						DropboxFileInfo info = mDBApi2.getFile(path, null,
-								outputStream, null);
-						Log.i("DbExampleLog",
-								"The file's rev is: " + info.getMetadata().rev);
+						DropboxFileInfo info = mDBApi2.getFile(path, null, outputStream, null);
+						Log.i("DbExampleLog", "The file's rev is: " + info.getMetadata().rev);
 
 						InputStream is = getAssets().open(path);
 						Book book = new EpubReader().readEpub(is);
 						Metadata metadata = book.getMetadata();
-						String bookInfo = "：" + metadata.getAuthors() + "\n ："
-								+ metadata.getPublishers() + "\n ："
-								+ metadata.getDates() + "\n ："
-								+ metadata.getTitles() + "\n ："
-								+ metadata.getDescriptions() + "\n ："
-								+ metadata.getLanguage() + "\n\n ：";
+						String bookInfo = "：" + metadata.getAuthors() + "\n ：" + metadata.getPublishers() + "\n ：" + metadata.getDates() + "\n ：" + metadata.getTitles() + "\n ："
+								+ metadata.getDescriptions() + "\n ：" + metadata.getLanguage() + "\n\n ：";
 						Log.e("epublib", bookInfo);
-						logTableOfContents(book.getTableOfContents()
-								.getTocReferences(), 0);
+						logTableOfContents(book.getTableOfContents().getTocReferences(), 0);
 
 					} catch (IOException e) {
 						Log.e("epublib", e.getMessage());
 					} catch (DropboxException e) {
-
 						e.printStackTrace();
 					}
 				}
-				Toast.makeText(getApplicationContext(),
-						((TextView) v).getText(), Toast.LENGTH_SHORT).show();
+				Toast.makeText(getApplicationContext(), ((TextView)((RelativeLayout) v).getChildAt(0)).getText(), Toast.LENGTH_SHORT).show();
 				return;
 			}
 
@@ -208,8 +191,7 @@ public class ListingActivity extends Activity {
 		String[] resp = null;
 		ArrayList<String> aux = new ArrayList<String>();
 		nameShownPathMap = new HashMap<String, String>();
-		for (Iterator<EntryMetadata> iterator = orderedValues.iterator(); iterator
-				.hasNext();) {
+		for (Iterator<EntryMetadata> iterator = orderedValues.iterator(); iterator.hasNext();) {
 			EntryMetadata e = iterator.next();
 			String name = e.getName();
 			String date = e.getModificationDate();
@@ -226,8 +208,7 @@ public class ListingActivity extends Activity {
 	}
 
 	private ArrayList<EntryMetadata> order(int orderBy) {
-		ArrayList<EntryMetadata> values = new ArrayList<EntryMetadata>(
-				listFiles.values());
+		ArrayList<EntryMetadata> values = new ArrayList<EntryMetadata>(listFiles.values());
 
 		if (orderBy == 0) {
 			// order by path
