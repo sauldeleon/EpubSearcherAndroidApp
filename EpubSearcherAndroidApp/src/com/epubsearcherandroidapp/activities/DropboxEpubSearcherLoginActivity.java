@@ -22,7 +22,7 @@ import com.dropbox.client2.session.TokenPair;
 import com.epubsearcherandroidapp.R;
 import com.epubsearcherandroidapp.tasks.FileListing;
 
-public class DropboxEpubSearcher extends Activity {
+public class DropboxEpubSearcherLoginActivity extends Activity {
 
 	private static final String TAG = "Dropbox";
 
@@ -54,13 +54,33 @@ public class DropboxEpubSearcher extends Activity {
 		// Basic Android widgets
 		setContentView(R.layout.activity_main);
 
+		configureRecursiveOptionCheckBox();
+
+		configureLoginButton();
+	}
+
+	private void configureLoginButton() {
+		loginButton = (Button) findViewById(R.id.buttonLoggin);
+
+		loginButton.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				if (logged) {
+					logOut();
+				} else {
+					mDBApi.getSession().startAuthentication(DropboxEpubSearcherLoginActivity.this);
+				}
+			}
+		});
+	}
+
+	private void configureRecursiveOptionCheckBox() {
 		checkboxRecursiveMode = (CheckBox) findViewById(R.id.checkBoxRecursive);
 
 		checkboxRecursiveMode.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				if (checkboxRecursiveMode.isChecked()){
-					new AlertDialog.Builder(DropboxEpubSearcher.this).setTitle("Atención")
+					new AlertDialog.Builder(DropboxEpubSearcherLoginActivity.this).setTitle("Atención")
 						.setMessage("Marcando esta opción, puede tardar varios minutos en listar todos tus libros electrónicos")
 						.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int which) {
@@ -72,18 +92,6 @@ public class DropboxEpubSearcher extends Activity {
 							}
 						}).setIcon(R.drawable.icon_alert)
 						.show();
-				}
-			}
-		});
-
-		loginButton = (Button) findViewById(R.id.buttonLoggin);
-
-		loginButton.setOnClickListener(new OnClickListener() {
-			public void onClick(View v) {
-				if (logged) {
-					logOut();
-				} else {
-					mDBApi.getSession().startAuthentication(DropboxEpubSearcher.this);
 				}
 			}
 		});
@@ -110,7 +118,7 @@ public class DropboxEpubSearcher extends Activity {
 				setLoggedIn(true);
 				// default order by path
 				boolean isRecursiveSearch = checkboxRecursiveMode.isChecked();
-				FileListing fileListing = new FileListing(DropboxEpubSearcher.this, mDBApi, "/", isRecursiveSearch);
+				FileListing fileListing = new FileListing(DropboxEpubSearcherLoginActivity.this, mDBApi, "/", isRecursiveSearch);
 				fileListing.execute();
 			} catch (IllegalStateException e) {
 				showToast("No se pudo autenticar con Dropbox" + e.getLocalizedMessage());

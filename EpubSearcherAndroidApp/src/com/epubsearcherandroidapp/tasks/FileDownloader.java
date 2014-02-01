@@ -77,7 +77,6 @@ public class FileDownloader extends AsyncTask<Void, Long, Boolean> {
 
 	@Override
 	protected void onPreExecute() {
-		// TODO Auto-generated method stub
 		super.onPreExecute();
 	}
 
@@ -93,30 +92,14 @@ public class FileDownloader extends AsyncTask<Void, Long, Boolean> {
 			if (mCanceled) {
 				return false;
 			}
-			
-//			String baseDir = Environment.getExternalStorageDirectory().getAbsolutePath();
-//			String filename = "temp.epub";
-//			String pathA = baseDir + File.separator + filename;
-//			File file = new File(pathA);
-//			FileOutputStream outputStream = new FileOutputStream(file);
-
-			//DropboxFileInfo info = mDBApi.getFile(path, null, outputStream, null);
 			DropboxInputStream info = mDBApi.getFileStream(path, null);
-			
-			//Log.i("DbExampleLog", "The file's rev is: " + info.getMetadata().rev);
 			if (mCanceled) {
 				info.close();
 				return false;
 			}
-			//InputStream is = mContext.getApplicationContext().getAssets().open(pathA);
 			Book book = new EpubReader().readEpub((InputStream)info);
-			Metadata metadata = book.getMetadata();
-			coverImage = BitmapFactory.decodeStream(book.getCoverImage().getInputStream());
-			String bookInfo = "：" + metadata.getAuthors() + "\n ：" + metadata.getPublishers() + "\n ：" 
-					+ metadata.getDates() + "\n ：" + metadata.getTitles() + "\n ："
-					+ metadata.getDescriptions() + "\n ：" + metadata.getLanguage() + "\n\n ：";
-			Log.e("epublib", bookInfo);
-			//logTableOfContents(book.getTableOfContents().getTocReferences(), 0);
+			//Metadata metadata = book.getMetadata();
+			coverImage = BitmapFactory.decodeStream(book.getCoverImage().getInputStream());		
 			info.close();
 		} catch (IOException e) {
 			Log.e("epublib", e.getMessage());
@@ -126,29 +109,9 @@ public class FileDownloader extends AsyncTask<Void, Long, Boolean> {
 		return true;
 	}
 
-//	private void logTableOfContents(List<TOCReference> tocReferences, int depth) {
-//		if (tocReferences == null) {
-//			return;
-//		}
-//		for (TOCReference tocReference : tocReferences) {
-//			StringBuilder tocstring = new StringBuilder();
-//			for (int i = 0; i < depth; i++) {
-//				tocstring.append("\t");
-//			}
-//			HashMap<String, String> map = new HashMap<String, String>();
-//			String k = tocstring.append(tocReference.getTitle()).toString();
-//			ArrayList<HashMap<String, String>> list1 = new ArrayList<HashMap<String, String>>();
-//			list1.add(map);
-//			String t = k;
-//			Log.i("epublib", tocstring.toString());
-//			logTableOfContents(tocReference.getChildren(), depth + 1);
-//
-//		}
-//	}
-	
 	private void goToShowCoverActivity() {
 		Intent activityList = new Intent(mContext, EpubCoverFullscreenActivity.class);
-		activityList.putExtra("portada", this.coverImage);
+		activityList.putExtra("epubCover", this.coverImage);
 		activityList.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		mContext.startActivity(activityList);
 	}
