@@ -1,12 +1,12 @@
 package com.epubsearcherandroidapp.activities;
 
-import com.epubsearcherandroidapp.R;
-import com.epubsearcherandroidapp.adapter.FullscreenCoverAdapter;
-
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.widget.ImageView;
+
+import com.epubsearcherandroidapp.R;
  
 public class EpubCoverFullscreenActivity extends Activity {
  
@@ -19,11 +19,10 @@ public class EpubCoverFullscreenActivity extends Activity {
         Intent i = getIntent();
  
         // Selected image id
-        int position = i.getExtras().getInt("id");
-        FullscreenCoverAdapter imageAdapter = new FullscreenCoverAdapter(this);
- 
+        Bitmap bitmap = (Bitmap) i.getParcelableExtra("portada");
+       
         ImageView imageView = (ImageView) findViewById(R.id.epub_cover_fullscreen);
-        imageView.setImageResource(imageAdapter.mThumbIds[position]);
+        imageView.setImageBitmap(bitmap);
     }
  
 }

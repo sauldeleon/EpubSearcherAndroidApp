@@ -122,7 +122,6 @@ public class ListingActivity extends Activity {
 				} else {
 					FileDownloader epubDownloader = new FileDownloader(ListingActivity.this,mDBApi,path);
 					epubDownloader.execute();
-					Toast.makeText(getApplicationContext(), name.getText(), Toast.LENGTH_LONG).show();
 				}
 				Toast.makeText(getApplicationContext(), name.getText(), Toast.LENGTH_SHORT).show();
 				return;
