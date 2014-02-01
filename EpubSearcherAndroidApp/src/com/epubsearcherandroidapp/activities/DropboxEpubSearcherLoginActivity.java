@@ -51,7 +51,7 @@ public class DropboxEpubSearcherLoginActivity extends Activity {
 		AndroidAuthSession session = buildSession();
 		mDBApi = new DropboxAPI<AndroidAuthSession>(session);
 
-		// Basic Android widgets
+		// Configurar la interfaz
 		setContentView(R.layout.activity_main);
 
 		configureRecursiveOptionCheckBox();

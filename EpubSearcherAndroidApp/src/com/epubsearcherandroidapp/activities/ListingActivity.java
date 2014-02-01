@@ -52,7 +52,7 @@ public class ListingActivity extends Activity {
 		Bundle b = getIntent().getExtras();
 		listFiles = (HashMap<String, EntryMetadata>) b.getSerializable("listado");
 
-		// Basic Android widgets
+		// Configurar la interfaz
 		setContentView(R.layout.activity_listing);
 
 		configureGridView();

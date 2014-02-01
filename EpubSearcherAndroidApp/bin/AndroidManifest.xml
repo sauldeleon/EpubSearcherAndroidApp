@@ -19,7 +19,7 @@
         android:launchMode="singleTask"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="com.epubsearcherandroidapp.activities.DropboxEpubSearcher"
+            android:name="com.epubsearcherandroidapp.activities.DropboxEpubSearcherLoginActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -30,7 +30,11 @@
         <activity
             android:name="com.epubsearcherandroidapp.activities.ListingActivity"
             android:label="@string/app_name" >
-           
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <activity
             android:name="com.dropbox.client2.android.AuthActivity"

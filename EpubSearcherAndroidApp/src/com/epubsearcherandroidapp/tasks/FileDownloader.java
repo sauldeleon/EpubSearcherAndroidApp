@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import nl.siegmann.epublib.domain.Book;
-import nl.siegmann.epublib.domain.Metadata;
 import nl.siegmann.epublib.epub.EpubReader;
 import android.app.ProgressDialog;
 import android.content.Context;
