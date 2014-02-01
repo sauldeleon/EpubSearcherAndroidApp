@@ -8,8 +8,9 @@ import java.util.Date;
 import com.dropbox.client2.DropboxAPI.Entry;
 
 /**
- * @author Tirias Clase creada para poder serializar un metadata y poder pasarlo
- *         a traves de las actividades
+ * @author Saúl de León 
+ * Clase creada para poder serializar un metadata y poder pasarlo
+ * a traves de las actividades
  */
 public class EntryMetadata extends Entry implements Serializable {
 

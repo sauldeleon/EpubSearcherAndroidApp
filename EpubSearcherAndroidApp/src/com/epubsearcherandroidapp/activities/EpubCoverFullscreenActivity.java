@@ -7,6 +7,11 @@ import android.widget.ImageView;
 
 import com.epubsearcherandroidapp.R;
  
+/**
+ * @author Saúl de León
+ * This class creates an activity to show an epub'x cover in fullscreen
+ *
+ */
 public class EpubCoverFullscreenActivity extends Activity {
  
     @Override

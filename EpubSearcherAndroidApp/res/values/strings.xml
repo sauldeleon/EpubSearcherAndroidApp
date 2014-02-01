@@ -9,7 +9,9 @@
     <string name="edit_pass">Password</string>
     <string name="login_button">Login</string>
     <string name="recursiveMode">Búsqueda recursiva</string>
-    <string name="recursiveAdvert">Tardara en función de la cantidad de carpetas y archivos</string>
+    <string name="autoTitle">Mostrar títulos de epubs</string>
+    <string name="recursiveAdvert">El uso de estas opciones aumentará el tiempo de búsqueda en función de la cantidad de carpetas y archivos</string>
+    
 
     <string-array name="order_array">
         <item>Ordenar</item>

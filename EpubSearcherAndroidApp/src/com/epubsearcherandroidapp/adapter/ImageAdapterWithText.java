@@ -9,14 +9,19 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.epubsearcherandroidapp.R;
+import com.epubsearcherandroidapp.activities.ListingActivity;
 
+/**
+ * @author Saúl de León
+ * This class allows to put the meta info in each file to show to the user
+ *
+ */
 public class ImageAdapterWithText extends BaseAdapter {
 
-	private Context context;
+	private ListingActivity context;
 	private final String[] values;
-	
 
-	public ImageAdapterWithText(Context context, String[] textValues) {
+	public ImageAdapterWithText(ListingActivity context, String[] textValues) {
 		this.context = context;
 		this.values = textValues;
 	}
@@ -26,11 +31,14 @@ public class ImageAdapterWithText extends BaseAdapter {
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
 		View gridView;
-		
+
 		gridView = new View(context);
 		gridView = inflater.inflate(R.layout.grid_file, null);
 
-		String[] splitted = values[position].split(" -.- ");		
+//		ListingGridViewListener g = new ListingGridViewListener(context);
+//		gridView.setOnTouchListener(g);
+		
+		String[] splitted = values[position].split(" -.- ");
 		// set value into textview
 		TextView textView = (TextView) gridView.findViewById(R.id.gridTextViewTitle);
 		textView.setText(splitted[0]);

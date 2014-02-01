@@ -25,6 +25,11 @@ import com.epubsearcherandroidapp.activities.EpubCoverFullscreenActivity;
 
 
 
+/**
+ * @author Saúl de León
+ * Task which takes the cover of an epub and show it to the user
+ *
+ */
 public class FileDownloader extends AsyncTask<Void, Long, Boolean> {
 
 	private Context mContext;

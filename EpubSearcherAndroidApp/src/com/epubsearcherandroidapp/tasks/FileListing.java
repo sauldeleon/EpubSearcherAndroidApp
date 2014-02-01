@@ -13,8 +13,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.widget.Toast;
@@ -32,6 +30,10 @@ import com.dropbox.client2.exception.DropboxUnlinkedException;
 import com.epubsearcherandroidapp.activities.ListingActivity;
 import com.epubsearcherandroidapp.util.EntryMetadata;
 
+/**
+ * @author Saúl de León
+ * Task used to do the first call to dropbox api and list the root folder, or just all the epubs
+ */
 public class FileListing extends AsyncTask<Void, Long, Boolean> {
 
 	private Context mContext;
@@ -45,16 +47,18 @@ public class FileListing extends AsyncTask<Void, Long, Boolean> {
 	private String mErrorMsg;
 	private String path;
 	private Boolean recMode;
+	private Boolean titleMode;
 
 	private HashMap<String, EntryMetadata> list;
 
-	public FileListing(Context context, DropboxAPI<AndroidAuthSession> api, String dropboxPath, Boolean recMode) {
+	public FileListing(Context context, DropboxAPI<AndroidAuthSession> api, String dropboxPath, Boolean recMode, boolean titleMode) {
 		mContext = context.getApplicationContext();
 
 		mDBApi = api;
 
 		path = dropboxPath;
 		this.recMode = recMode;
+		this.titleMode = titleMode;
 
 		mDialog = new ProgressDialog(context);
 		mDialog.setMessage("Descargando listado de archivos...");
@@ -154,11 +158,15 @@ public class FileListing extends AsyncTask<Void, Long, Boolean> {
 		}
 	}
 
+	/**
+	 * Calls to the listingActivity Activity
+	 */
 	private void goToListingActivity() {
 		Intent activityList = new Intent(mContext, ListingActivity.class);
 		ListingActivity.mDBApi = mDBApi;
 		Bundle b = new Bundle();
 		b.putSerializable("listado", this.list);
+		b.putBoolean("titleMode", this.titleMode);
 		activityList.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		activityList.putExtras(b);
 		mContext.startActivity(activityList);
@@ -169,7 +177,16 @@ public class FileListing extends AsyncTask<Void, Long, Boolean> {
 		error.show();
 	}
 
-	// listar un directorio dado un path de ese directorio
+	
+	/**
+	 * 
+	 * @param path the path to seek
+	 * @param rec tells if is a recursive search or not
+	 * @return all files/directories in path folder
+	 * @throws DropboxException
+	 * @throws ParseException
+	 * @throws IOException
+	 */
 	private HashMap<String, EntryMetadata> listingFolderPath(String path, boolean rec) 
 			throws DropboxException, ParseException, IOException {
 		HashMap<String, EntryMetadata> pathEntries = new HashMap<String, EntryMetadata>();
@@ -185,9 +202,11 @@ public class FileListing extends AsyncTask<Void, Long, Boolean> {
 							DropboxInputStream info = mDBApi.getFileStream(ent.path, null);
 							Book book = new EpubReader().readEpub((InputStream) info);
 							EntryMetadata e = new EntryMetadata(ent.path, ent.fileName(), ent.modified, ent.isDir);
-							if (book.getMetadata().getTitles().get(0) != null) {
-								e.setName(book.getMetadata().getTitles().get(0));
-							} 
+							if (this.titleMode) {
+								if (book.getMetadata().getTitles().get(0) != null) {
+									e.setName(book.getMetadata().getTitles().get(0));
+								}
+							}
 							pathEntries.put(ent.path, e);
 							info.close();
 						} else {
@@ -205,9 +224,15 @@ public class FileListing extends AsyncTask<Void, Long, Boolean> {
 		return pathEntries;
 	}
 
-	// metodo para listar recursivamente todos los epub, seguramente pase a
-	// deprecated y se muestr biblioteca por directorios
-
+	
+	/**
+	 * @param dirent the actual folder
+	 * @param files files/directories in the {@link}dirent folder
+	 * @return all epub files in path folder
+	 * @throws DropboxException
+	 * @throws ParseException
+	 * @throws IOException
+	 */
 	private HashMap<String, EntryMetadata> getEpubFilesRec(Entry dirent, HashMap<String, EntryMetadata> files) 
 			throws DropboxException, ParseException, IOException {
 		// Listamos todos los epub que hay en el directorio raiz y
@@ -223,11 +248,13 @@ public class FileListing extends AsyncTask<Void, Long, Boolean> {
 						DropboxInputStream info = mDBApi.getFileStream(ent.path, null);
 						Book book = new EpubReader().readEpub((InputStream) info);
 						EntryMetadata e = new EntryMetadata(ent.path, ent.fileName(), ent.modified, ent.isDir);
-						if (book.getMetadata().getTitles().get(0) != null) {
-							e.setName(book.getMetadata().getTitles().get(0));
-						} 
+						if (this.titleMode) {
+							if (book.getMetadata().getTitles().get(0) != null) {
+								e.setName(book.getMetadata().getTitles().get(0));
+							}
+						}
 						files.put(ent.path, e);
-						info.close();					
+						info.close();
 					}
 				}
 			}

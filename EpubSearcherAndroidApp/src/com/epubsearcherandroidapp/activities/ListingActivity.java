@@ -32,17 +32,28 @@ import com.epubsearcherandroidapp.tasks.FileDownloader;
 import com.epubsearcherandroidapp.tasks.FileListing;
 import com.epubsearcherandroidapp.util.EntryMetadata;
 
+/**
+ * @author Saúl de León
+ *	This Activity lists the files or directories found by the dropbox api and list them in a GridView
+ */
 public class ListingActivity extends Activity {
 
 	private GridView listingGridView;
-	// private ArrayAdapter<String> adGridView;
-
+	
 	private Spinner orderSpinner;
 
 	public static DropboxAPI<AndroidAuthSession> mDBApi = null;
 
+	/**
+	 * relation between a path and its file/directory info
+	 */
 	private HashMap<String, EntryMetadata> listFiles;
+	
+	private Boolean titleMode;
 
+	/**
+	 * Relation between a filename shown in the app and his own path
+	 */
 	private HashMap<String, String> nameShownPathMap = new HashMap<String, String>();
 
 	@SuppressWarnings("unchecked")
@@ -51,16 +62,18 @@ public class ListingActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		Bundle b = getIntent().getExtras();
 		listFiles = (HashMap<String, EntryMetadata>) b.getSerializable("listado");
+		titleMode = b.getBoolean("titleMode");
 
 		// Configurar la interfaz
+
 		setContentView(R.layout.activity_listing);
-
 		configureGridView();
-
 		configureSpinner();
-
 	}
 
+	/**
+	 * configures the search option Spinner.
+	 */
 	private void configureSpinner() {
 		orderSpinner = (Spinner) findViewById(R.id.orderSpinner);
 		orderSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
@@ -94,22 +107,27 @@ public class ListingActivity extends Activity {
 		});
 	}
 
+	/**
+	 * Configures the gridView in which the epubs/folders are listed
+	 */
 	private void configureGridView() {
+
 		ArrayList<EntryMetadata> orderedValues = order(1);
 		String[] shownList = generateViewNames(orderedValues);
 
 		listingGridView = (GridView) findViewById(R.id.listingGridView);
-		
+
 		listingGridView.setBackgroundColor(Color.WHITE);
 		listingGridView.setNumColumns(1);
 		listingGridView.setGravity(Gravity.CENTER);
 		listingGridView.setAdapter(new ImageAdapterWithText(this, shownList));
+
 		listingGridView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
 				TextView name = ((TextView) ((RelativeLayout) v).getChildAt(2));
 				TextView date = ((TextView) ((RelativeLayout) v).getChildAt(1));
-				
+
 				String text = name.getText().toString() + " -F- " + date.getText().toString();
 				String path = nameShownPathMap.get(text);
 				if (path == null) {
@@ -117,10 +135,10 @@ public class ListingActivity extends Activity {
 					path = nameShownPathMap.get(text);
 				}
 				if (listFiles.get(path).getIsDir()) {
-					FileListing fileListing = new FileListing(ListingActivity.this, mDBApi, path, false);
+					FileListing fileListing = new FileListing(ListingActivity.this, mDBApi, path, false, titleMode);
 					fileListing.execute();
 				} else {
-					FileDownloader epubDownloader = new FileDownloader(ListingActivity.this,mDBApi,path);
+					FileDownloader epubDownloader = new FileDownloader(ListingActivity.this, mDBApi, path);
 					epubDownloader.execute();
 				}
 				Toast.makeText(getApplicationContext(), name.getText(), Toast.LENGTH_SHORT).show();
@@ -130,6 +148,11 @@ public class ListingActivity extends Activity {
 		});
 	}
 
+	/**
+	 * This method build the names to show at the user
+	 * @param orderedValues the values ordered by the way the user indicates with the spinner
+	 * @return a list of Strings representing the names of the folders/directorioes ordered
+	 */
 	private String[] generateViewNames(ArrayList<EntryMetadata> orderedValues) {
 		String[] resp = null;
 		ArrayList<String> aux = new ArrayList<String>();
@@ -150,6 +173,11 @@ public class ListingActivity extends Activity {
 		return resp;
 	}
 
+	/**
+	 * Order method
+	 * @param orderBy the order method
+	 * @return the list of Files metadata ordered
+	 */
 	private ArrayList<EntryMetadata> order(int orderBy) {
 		ArrayList<EntryMetadata> values = new ArrayList<EntryMetadata>(listFiles.values());
 
@@ -198,5 +226,50 @@ public class ListingActivity extends Activity {
 			Collections.sort(values, compareByDate);
 		}
 		return values;
+	}
+	
+	
+	/*
+	 * GETTERS AND SETTERS
+	 */
+	
+	public GridView getListingGridView() {
+		return listingGridView;
+	}
+
+	public void setListingGridView(GridView listingGridView) {
+		this.listingGridView = listingGridView;
+	}
+
+	public static DropboxAPI<AndroidAuthSession> getmDBApi() {
+		return mDBApi;
+	}
+
+	public static void setmDBApi(DropboxAPI<AndroidAuthSession> mDBApi) {
+		ListingActivity.mDBApi = mDBApi;
+	}
+
+	public HashMap<String, EntryMetadata> getListFiles() {
+		return listFiles;
+	}
+
+	public void setListFiles(HashMap<String, EntryMetadata> listFiles) {
+		this.listFiles = listFiles;
+	}
+
+	public Boolean getTitleMode() {
+		return titleMode;
+	}
+
+	public void setTitleMode(Boolean titleMode) {
+		this.titleMode = titleMode;
+	}
+
+	public HashMap<String, String> getNameShownPathMap() {
+		return nameShownPathMap;
+	}
+
+	public void setNameShownPathMap(HashMap<String, String> nameShownPathMap) {
+		this.nameShownPathMap = nameShownPathMap;
 	}
 }
