@@ -37,7 +37,7 @@ import com.epubsearcherandroidapp.util.EntryMetadata;
 public class FileListing extends AsyncTask<Void, Long, Boolean> {
 
 	private Context mContext;
-	private final ProgressDialog mDialog;
+	private ProgressDialog mDialog;
 	private DropboxAPI<AndroidAuthSession> mDBApi;
 
 	private FileOutputStream mFos;
@@ -60,6 +60,10 @@ public class FileListing extends AsyncTask<Void, Long, Boolean> {
 		this.recMode = recMode;
 		this.titleMode = titleMode;
 
+		configureProgressDialog(context);
+	}
+
+	private void configureProgressDialog(Context context) {
 		mDialog = new ProgressDialog(context);
 		mDialog.setMessage("Descargando listado de archivos...");
 		mDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancelar", new OnClickListener() {

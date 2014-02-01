@@ -60,7 +60,7 @@ public class DropboxEpubSearcherLoginActivity extends Activity {
 		setContentView(R.layout.activity_main);
 		configureRecursiveOptionCheckBox();		
 		configureTitleOptionCheckBox();
-		configureLoginButton();
+		configureEnterButton();
 	}
 
 	/**
@@ -116,8 +116,8 @@ public class DropboxEpubSearcherLoginActivity extends Activity {
 	/**
 	 * Configures the login Button
 	 */
-	private void configureLoginButton() {
-		loginButton = (Button) findViewById(R.id.buttonLoggin);
+	private void configureEnterButton() {
+		loginButton = (Button) findViewById(R.id.enterButton);
 
 		loginButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
@@ -146,7 +146,8 @@ public class DropboxEpubSearcherLoginActivity extends Activity {
 				TokenPair tokens = session.getAccessTokenPair();
 				storeKeys(tokens.key, tokens.secret);
 				setLoggedIn(true);
-				// default order by path
+				
+				// default order by name
 				boolean isRecursiveSearch = checkboxRecursiveMode.isChecked();
 				boolean isAutoTitleSearch = checkBoxAutoTitleMode.isChecked();
 				FileListing fileListing = new FileListing(DropboxEpubSearcherLoginActivity.this, mDBApi, "/", isRecursiveSearch, isAutoTitleSearch);

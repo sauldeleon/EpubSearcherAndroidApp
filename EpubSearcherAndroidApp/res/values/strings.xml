@@ -2,15 +2,14 @@
 <resources>
 
     <string name="app_name">Epub Listing App</string>
+    <string name="show_info">Selecciona las opciones de búsqueda y entra en dropbox</string>
     <string name="action_settings">Settings</string>
-    <string name="insert_user">Introduzca usuario</string>
-    <string name="insert_pass">Introduzca contraseña</string>
-    <string name="edit_user">Usuario</string>
-    <string name="edit_pass">Password</string>
-    <string name="login_button">Login</string>
+    <string name="enter_button">Entrar a Dropbox</string>
     <string name="recursiveMode">Búsqueda recursiva</string>
     <string name="autoTitle">Mostrar títulos de epubs</string>
-    <string name="recursiveAdvert">El uso de estas opciones aumentará el tiempo de búsqueda en función de la cantidad de carpetas y archivos</string>
+    <string name="welcomeText">Bienvenido</string>
+    <string name="titleAdvert">Sustituirá el nombre del archivo por el título del libro</string>
+    <string name="recursiveAdvert">Automáticamente buscara por todas las carpetas desde tu directorio raíz y mostrará sólo los archivos epub</string>
     
 
     <string-array name="order_array">

@@ -9,83 +9,65 @@
     tools:context=".MainActivity" >
 
     <Button
-        android:id="@+id/buttonLoggin"
+        android:id="@+id/enterButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="36dp"
-        android:text="@string/login_button" />
+        android:text="@string/enter_button" />
 
     <TextView
-        android:id="@+id/textViewUser"
+        android:id="@+id/welcomeView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="31dp"
-        android:text="@string/insert_user" />
-
-    <EditText
-        android:id="@+id/editTextUser"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignRight="@+id/editTextPass"
-        android:layout_below="@+id/textViewUser"
-        android:layout_marginTop="18dp"
-        android:ems="10"
-        android:hint="@string/edit_user"
-        android:maxLines="1" >
-
-        <requestFocus />
-    </EditText>
-
-    <TextView
-        android:id="@+id/TextViewPass"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/editTextUser"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="24dp"
-        android:text="@string/insert_pass" />
-
-    <EditText
-        android:id="@+id/editTextPass"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/TextViewPass"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="16dp"
-        android:ems="10"
-        android:hint="@string/edit_pass"
-        android:inputType="textPassword"
-        android:maxLines="1" />
+        android:layout_marginTop="22dp"
+        android:text="@string/welcomeText"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <CheckBox
         android:id="@+id/checkBoxRecursive"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/editTextPass"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="27dp"
+        android:layout_alignRight="@+id/enterButton"
+        android:layout_below="@+id/welcomeView"
+        android:layout_marginTop="54dp"
         android:text="@string/recursiveMode" />
 
     <TextView
         android:id="@+id/recursiveAdvert"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/buttonLoggin"
+        android:layout_alignRight="@+id/textInfo"
         android:layout_below="@+id/checkBoxRecursive"
-        android:layout_marginTop="40dp"
         android:text="@string/recursiveAdvert"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <TextView
+        android:id="@+id/textInfo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/welcomeView"
+        android:layout_centerHorizontal="true"
+        android:text="@string/show_info" />
+
+    <TextView
+        android:id="@+id/titleAdvert"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/recursiveAdvert"
+        android:layout_centerVertical="true"
+        android:text="@string/titleAdvert"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <CheckBox
         android:id="@+id/checkBoxEpubTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/checkBoxRecursive"
-        android:layout_below="@+id/checkBoxRecursive"
+        android:layout_above="@+id/titleAdvert"
+        android:layout_centerHorizontal="true"
         android:text="@string/autoTitle" />
 
 </RelativeLayout>
