@@ -8,15 +8,6 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity" >
 
-    <Button
-        android:id="@+id/enterButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="36dp"
-        android:text="@string/enter_button" />
-
     <TextView
         android:id="@+id/welcomeView"
         android:layout_width="wrap_content"
@@ -27,19 +18,11 @@
         android:text="@string/welcomeText"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
-    <CheckBox
-        android:id="@+id/checkBoxRecursive"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignRight="@+id/enterButton"
-        android:layout_below="@+id/welcomeView"
-        android:layout_marginTop="54dp"
-        android:text="@string/recursiveMode" />
-
     <TextView
         android:id="@+id/recursiveAdvert"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/checkBoxRecursive"
         android:layout_alignRight="@+id/textInfo"
         android:layout_below="@+id/checkBoxRecursive"
         android:text="@string/recursiveAdvert"
@@ -53,15 +36,6 @@
         android:layout_centerHorizontal="true"
         android:text="@string/show_info" />
 
-    <TextView
-        android:id="@+id/titleAdvert"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/recursiveAdvert"
-        android:layout_centerVertical="true"
-        android:text="@string/titleAdvert"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
-
     <CheckBox
         android:id="@+id/checkBoxEpubTitle"
         android:layout_width="wrap_content"
@@ -69,5 +43,42 @@
         android:layout_above="@+id/titleAdvert"
         android:layout_centerHorizontal="true"
         android:text="@string/autoTitle" />
+
+    <Button
+        android:id="@+id/enterButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/reListButton"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="24dp"
+        android:text="@string/enter_button" />
+
+    <Button
+        android:id="@+id/reListButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="32dp"
+        android:text="@string/reListing" />
+
+    <TextView
+        android:id="@+id/titleAdvert"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/checkBoxEpubTitle"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:text="@string/titleAdvert"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <CheckBox
+        android:id="@+id/checkBoxRecursive"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/checkBoxEpubTitle"
+        android:layout_below="@+id/textInfo"
+        android:layout_marginTop="23dp"
+        android:text="@string/recursiveMode" />
 
 </RelativeLayout>

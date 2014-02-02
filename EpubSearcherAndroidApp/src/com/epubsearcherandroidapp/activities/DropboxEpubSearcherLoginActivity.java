@@ -24,7 +24,7 @@ import com.epubsearcherandroidapp.tasks.FileListing;
 
 /**
  * @author Saúl de León
- *
+ * 
  */
 public class DropboxEpubSearcherLoginActivity extends Activity {
 
@@ -43,9 +43,11 @@ public class DropboxEpubSearcherLoginActivity extends Activity {
 	private DropboxAPI<AndroidAuthSession> mDBApi;
 
 	private Button loginButton;
+	private Button reListButton;
 	private CheckBox checkboxRecursiveMode;
 	private CheckBox checkBoxAutoTitleMode;
 	private boolean logged;
+	private boolean firstLogin;
 
 	// private Button listingButton;
 
@@ -55,12 +57,14 @@ public class DropboxEpubSearcherLoginActivity extends Activity {
 
 		AndroidAuthSession session = buildSession();
 		mDBApi = new DropboxAPI<AndroidAuthSession>(session);
+		firstLogin = false;
 
 		// Configurar la interfaz
 		setContentView(R.layout.activity_main);
-		configureRecursiveOptionCheckBox();		
+		configureRecursiveOptionCheckBox();
 		configureTitleOptionCheckBox();
 		configureEnterButton();
+		configureReListButton();
 	}
 
 	/**
@@ -72,13 +76,13 @@ public class DropboxEpubSearcherLoginActivity extends Activity {
 		checkBoxAutoTitleMode.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (checkBoxAutoTitleMode.isChecked()){
+				if (checkBoxAutoTitleMode.isChecked()) {
 					createAlertDialog("En función del número de epubs que tenga, marcar esta opción puede ser más costosa");
 				}
 			}
 		});
 	}
-	
+
 	/**
 	 * Configures a new checkBox for the recursive option
 	 */
@@ -88,31 +92,28 @@ public class DropboxEpubSearcherLoginActivity extends Activity {
 		checkboxRecursiveMode.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (checkboxRecursiveMode.isChecked()){
+				if (checkboxRecursiveMode.isChecked()) {
 					createAlertDialog("Marcando esta opción, puede tardar varios minutos en listar todos tus libros electrónicos");
 				}
 			}
 		});
 	}
-	
+
 	/**
 	 * Configures a dialog in for the checkboxes activation
 	 */
 	private void createAlertDialog(String text) {
-		new AlertDialog.Builder(DropboxEpubSearcherLoginActivity.this).setTitle("Atención")
-			.setMessage(text)
-			.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
-					// dejarlo como esta
-				}
-			}).setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
-					checkBoxAutoTitleMode.toggle();
-				}
-			}).setIcon(R.drawable.icon_alert)
-			.show();
+		new AlertDialog.Builder(DropboxEpubSearcherLoginActivity.this).setTitle("Atención").setMessage(text).setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				// dejarlo como esta
+			}
+		}).setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				checkBoxAutoTitleMode.toggle();
+			}
+		}).setIcon(R.drawable.icon_alert).show();
 	}
-	
+
 	/**
 	 * Configures the login Button
 	 */
@@ -130,8 +131,22 @@ public class DropboxEpubSearcherLoginActivity extends Activity {
 		});
 	}
 	
+	private void configureReListButton() {
+		reListButton = (Button) findViewById(R.id.reListButton);
 
-	
+		reListButton.setVisibility(View.INVISIBLE);
+		reListButton.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				if (logged) {
+					boolean isRecursiveSearch = checkboxRecursiveMode.isChecked();
+					boolean isAutoTitleSearch = checkBoxAutoTitleMode.isChecked();
+					FileListing fileListing = new FileListing(DropboxEpubSearcherLoginActivity.this, mDBApi, "/", isRecursiveSearch, isAutoTitleSearch);
+					fileListing.execute();
+				} 
+			}
+		});
+	}
+
 	@Override
 	protected void onResume() {
 		super.onResume();
@@ -146,12 +161,15 @@ public class DropboxEpubSearcherLoginActivity extends Activity {
 				TokenPair tokens = session.getAccessTokenPair();
 				storeKeys(tokens.key, tokens.secret);
 				setLoggedIn(true);
-				
+
 				// default order by name
-				boolean isRecursiveSearch = checkboxRecursiveMode.isChecked();
-				boolean isAutoTitleSearch = checkBoxAutoTitleMode.isChecked();
-				FileListing fileListing = new FileListing(DropboxEpubSearcherLoginActivity.this, mDBApi, "/", isRecursiveSearch, isAutoTitleSearch);
-				fileListing.execute();
+				if (!firstLogin) {
+					firstLogin = true;
+					boolean isRecursiveSearch = checkboxRecursiveMode.isChecked();
+					boolean isAutoTitleSearch = checkBoxAutoTitleMode.isChecked();
+					FileListing fileListing = new FileListing(DropboxEpubSearcherLoginActivity.this, mDBApi, "/", isRecursiveSearch, isAutoTitleSearch);
+					fileListing.execute();
+				}
 			} catch (IllegalStateException e) {
 				showToast("No se pudo autenticar con Dropbox" + e.getLocalizedMessage());
 				Log.i(TAG, "Error de login", e);
@@ -159,9 +177,9 @@ public class DropboxEpubSearcherLoginActivity extends Activity {
 		}
 	}
 
-	
 	/**
 	 * creates a session with dropbpox
+	 * 
 	 * @return the session in dropbox api
 	 */
 	private AndroidAuthSession buildSession() {
@@ -191,10 +209,13 @@ public class DropboxEpubSearcherLoginActivity extends Activity {
 		clearKeys();
 		// Cambiamos la UI al modo de unlinked
 		setLoggedIn(false);
+		firstLogin = false;
 	}
 
 	/**
-	 * this method retrieves the keys of the last login session active in dropbox
+	 * this method retrieves the keys of the last login session active in
+	 * dropbox
+	 * 
 	 * @return keys of the last login
 	 */
 	private String[] getKeys() {
@@ -213,6 +234,7 @@ public class DropboxEpubSearcherLoginActivity extends Activity {
 
 	/**
 	 * stores the key-secret pair for the dropbox login
+	 * 
 	 * @param key
 	 * @param secret
 	 */
@@ -236,13 +258,15 @@ public class DropboxEpubSearcherLoginActivity extends Activity {
 	}
 
 	/**
-	 * Little change in the UI when login state changes
+	 * Changes in the UI when login state changes
 	 */
 	private void setLoggedIn(boolean loggedIn) {
 		logged = loggedIn;
 		if (loggedIn) {
+			reListButton.setVisibility(View.VISIBLE);
 			loginButton.setText("Desconectar");
 		} else {
+			reListButton.setVisibility(View.INVISIBLE);
 			loginButton.setText("Entrar a Dropbox");
 		}
 	}

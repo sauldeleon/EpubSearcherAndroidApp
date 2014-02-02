@@ -7,6 +7,7 @@
     <string name="enter_button">Entrar a Dropbox</string>
     <string name="recursiveMode">Búsqueda recursiva</string>
     <string name="autoTitle">Mostrar títulos de epubs</string>
+    <string name="reListing">Volver al listado</string>
     <string name="welcomeText">Bienvenido</string>
     <string name="titleAdvert">Sustituirá el nombre del archivo por el título del libro</string>
     <string name="recursiveAdvert">Automáticamente buscara por todas las carpetas desde tu directorio raíz y mostrará sólo los archivos epub</string>
